@@ -1,0 +1,18 @@
+{
+  "css.lint.unknownAtRules": "ignore",
+  "tailwindCSS.includeLanguages": {
+    "vue": "html",
+    "typescriptreact": "html",
+    "javascriptreact": "html",
+    "typescript": "typescript",
+    "javascript": "javascript",
+    "less": "css",
+    "css": "css"
+  },
+  "tailwindCSS.emmetCompletions": true,
+  "files.associations": {
+    "*.tsx": "typescriptreact",
+    "*.less": "css",
+    "*.css": "css"
+  }
+}
