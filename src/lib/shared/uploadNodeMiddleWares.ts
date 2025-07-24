@@ -16,6 +16,8 @@ enum EPatchType {
   children = "children",
 }
 
+const patchableKeys = Object.values(EPatchType)
+
 export const eventMiddleware: PatchMiddleware<PatchCtx> = (ctx, next) => {
   const { key, preVal, nextVal, node } = ctx
   if (!key.startsWith(EPatchType.event)) return next()
@@ -63,7 +65,7 @@ export const childrenMiddleware: PatchMiddleware<PatchCtx> = (ctx, next) => {
 }
 export const defaultMiddleware: PatchMiddleware<PatchCtx> = (ctx) => {
   const { key, nextVal, node } = ctx
-  if (Object.values(EPatchType).includes(key as any) || key.startsWith(EPatchType.event)) return
+  if (patchableKeys.includes(key as any) || key.startsWith(EPatchType.event)) return
   ;(node as any)[key] = nextVal[key]
 }
 
@@ -82,11 +84,10 @@ export const updateNodeMiddleWare = createMiddleWare<PatchCtx>()
  * @param next
  */
 function patchClass(el: HTMLElement, prev: string, next: string) {
-  const prevArr = prev.trim().split(/\s+/)
-  const nextArr = next.trim().split(/\s+/)
-
+  const prevArr = prev?.trim().split(/\s+/).filter(Boolean) ?? []
+  const nextArr = next?.trim().split(/\s+/).filter(Boolean) ?? []
   for (const cls of prevArr) {
-    if (!nextArr.includes(cls)) {
+    if (!nextArr.includes(cls) && el.classList) {
       el.classList.remove(cls)
     }
   }

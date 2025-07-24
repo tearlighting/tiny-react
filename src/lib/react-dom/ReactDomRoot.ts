@@ -1,5 +1,4 @@
-import { createFiber, Fiber } from "../reconciler"
-import { scheduleUpdateOnFiber } from "../reconciler/ReactFiberWorkLoop"
+import { createFiber, Fiber, scheduleUpdateOnFiber } from "../reconciler"
 
 export class ReactDomRoot {
   constructor(private _internalRoot: HTMLElement) {}

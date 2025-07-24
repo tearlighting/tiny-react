@@ -13,7 +13,7 @@ export class Fiber {
   /**
    * vnode上的props，直接拿
    */
-  props: Partial<Record<string, any> & { id: string; children: VNode[] | string; className: string }> | null
+  props: Partial<{ id: string; children: VNode[] | string; className: string } & Record<string, any>> | null
   /**
    * 真实dom
    */

@@ -1,5 +1,6 @@
 import type { Fiber } from "./ReactFiber"
 import { beginWork } from "./ReactFiberBeginWork"
+import { completeWork } from "./ReactFiberCommitWork"
 /**
  * work in progress
  * 正在工作的fiber对象
@@ -58,7 +59,11 @@ function performUnitOfWork() {
   wip = null
 }
 
-function completeWork(fiber: Fiber | null) {}
+/**
+ * commit阶段
+ */
 function commitRoot() {
-  throw new Error("Function not implemented.")
+  completeWork(wipRoot)
+  wip = null
+  //   throw new Error("Function not implemented.")
 }

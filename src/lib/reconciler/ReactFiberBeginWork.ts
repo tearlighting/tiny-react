@@ -1,5 +1,6 @@
 import { EFiberTags } from "../shared/constants"
 import type { Fiber } from "./ReactFiber"
+import { updateHostComponent, updateHostText } from "./ReactFiberReconciler"
 
 /**
  *
@@ -11,13 +12,13 @@ export function beginWork(wip: Fiber | null) {
   ;(tag && tagsStrategy[tag]?.(wip)) || tagsStrategy.default()
 }
 
-const tagsStrategy: Record<EFiberTags, (fiber: Fiber | null) => any> & {
+const tagsStrategy: Record<EFiberTags, (wip: Fiber | null) => any> & {
   default: () => any
 } = {
   default: () => {},
   [EFiberTags.Fragment]: () => {},
-  [EFiberTags.HostComponent]: () => {},
+  [EFiberTags.HostComponent]: updateHostComponent,
   [EFiberTags.ClassComponent]: () => {},
   [EFiberTags.FunctionComponent]: () => {},
-  [EFiberTags.HostText]: () => {},
+  [EFiberTags.HostText]: updateHostText,
 }

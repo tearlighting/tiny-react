@@ -1,3 +1,5 @@
+import { isStr, updateNode } from "../shared/utils"
+import { reconcilerChildren } from "./ReactChildFiber"
 import type { Fiber } from "./ReactFiber"
 
 /**
@@ -5,11 +7,15 @@ import type { Fiber } from "./ReactFiber"
  * @param wip
  * 处理原生节点
  */
-function updateHostComponent(wip: Fiber) {
-  //创建原生dom
-  if (!wip.stateNode) {
+export function updateHostComponent(wip: Fiber | null) {
+  //初次渲染
+  if (wip && !wip?.stateNode) {
+    //创建原生dom
     wip.stateNode = document.createElement(wip.type as string)
     //设置属性
+    updateNode(wip.stateNode, {}, wip.props!)
+    //加入子节点fiber
+    reconcilerChildren(wip, wip.props?.children ?? [])
   }
 }
 /**
@@ -17,8 +23,8 @@ function updateHostComponent(wip: Fiber) {
  * @param wip
  * 处理文本节点
  */
-export function updateHostText(wip: Fiber) {
-  if (wip && !Array.isArray(wip.props?.children)) {
-    wip.stateNode = document.createTextNode(wip.props?.children!) as unknown as HTMLElement
+export function updateHostText(wip: Fiber | null) {
+  if (wip && !isStr(wip.props?.children)) {
+    wip.stateNode = document.createTextNode(wip.props?.children! as any) as unknown as HTMLElement
   }
 }
