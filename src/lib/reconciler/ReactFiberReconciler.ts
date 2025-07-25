@@ -14,7 +14,7 @@ export function updateHostComponent(wip: Fiber | null) {
     wip.stateNode = document.createElement(wip.type as string)
     //设置属性
     updateNode(wip.stateNode, {}, wip.props!)
-    //加入子节点fiber
+    //加入子节点fiber,不是递归所有，只是当前节点的子节点
     reconcilerChildren(wip, wip.props?.children ?? [])
   }
 }

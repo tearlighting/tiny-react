@@ -20,7 +20,7 @@ export function reconcilerChildren(returnFiber: Fiber, children: VNode | string 
   /**
    * @var previousNewFiber 对应的缓冲树上的fiber对象
    */
-  let oldFiber = returnFiber.alternate && returnFiber.alternate.child
+  let oldFiber = returnFiber.alternate?.child ?? null
   /**
    * @var newChildren 遍历index
    */
