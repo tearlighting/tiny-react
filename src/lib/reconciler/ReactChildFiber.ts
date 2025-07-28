@@ -1,5 +1,7 @@
+import { EFiberFlags } from "../shared/constants"
 import { isStr } from "../shared/utils"
 import { createFiber, type Fiber } from "./ReactFiber"
+import { deleteRemainingChildren, mapRemainingChildren, placeChild, sameNode } from "./ReactFiberAssistant"
 
 /**
  *生成子fiber，然后串成链表
@@ -35,14 +37,88 @@ export function reconcilerChildren(returnFiber: Fiber, children: VNode | string 
    * true是更新
    */
   let shouldTrackSideEffects = !!returnFiber.alternate
+  /**
+   * 下一个或者当前的fiber对象
+   */
+  let nextOldFiber = null
 
   //第一次遍历，会尝试复用
   for (; oldFiber && i < newChildren.length; i++) {
     //第一次肯定不会，oldFiber不存在
+    const newChildrenVNode = newChildren[i]
+    if (newChildrenVNode === null || isStr(newChildrenVNode)) {
+      continue
+    }
+    //如果oldFiber存在，则尝试复用
+    //old 是 5,4,3,2,1
+    //new 是 1,2,3,4,5
+    if (oldFiber.index && oldFiber.index > i) {
+      nextOldFiber = oldFiber
+      oldFiber = null
+    } else {
+      nextOldFiber = oldFiber.sibling
+    }
+    if (!sameNode(newChildrenVNode, oldFiber)) {
+      //还原
+      if (!oldFiber) oldFiber = nextOldFiber
+      break
+    }
+    //可以复用,复用dom对象
+    const newFiber = createFiber(newChildrenVNode, returnFiber)
+    Object.assign<Fiber, Partial<Fiber>>(newFiber, {
+      stateNode: oldFiber!.stateNode,
+      alternate: oldFiber,
+      flags: EFiberFlags.Update,
+    })
+    lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, i, shouldTrackSideEffects)
+    if (previousNewFiber) {
+      previousNewFiber.sibling = newFiber
+    } else {
+      returnFiber.child = newFiber
+    }
+    previousNewFiber = newFiber
+    oldFiber = nextOldFiber
   }
   //进入上面的循环，且i===newChildren.length,说明只需要更新
+  //该创建的都创建了
   if (i === newChildren.length) {
+    //删除多余的
+    deleteRemainingChildren(returnFiber, oldFiber)
+  } else {
+    //第二次遍历
+    //新增的没有创建完，需要建Map查找子节点
+    const map = mapRemainingChildren(oldFiber)
+    while (i < newChildren.length) {
+      const newChildrenVNode = newChildren[i]
+      if (newChildrenVNode === null || isStr(newChildrenVNode)) {
+        i++
+        continue
+      }
+      const newFiber = createFiber(newChildrenVNode, returnFiber)
+      const key = newFiber.key ?? newFiber.index!.toString()
+      if (map.has(key)) {
+        const alternate = map.get(key)
+        Object.assign<Fiber, Partial<Fiber>>(newFiber, {
+          stateNode: alternate!.stateNode,
+          alternate,
+          flags: EFiberFlags.Update,
+        })
+        map.delete(key)
+      }
+      lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, i, shouldTrackSideEffects)
+      if (previousNewFiber) {
+        previousNewFiber.sibling = newFiber
+      } else {
+        returnFiber.child = newFiber
+      }
+      previousNewFiber = newFiber
+    }
+    //删除多余的
+    for (let [_, alternate] of map.entries()) {
+      deleteRemainingChildren(returnFiber, alternate)
+    }
   }
+  //mount
   if (!oldFiber) {
     //第一次渲染
     for (; i < newChildren.length; i++) {
@@ -62,20 +138,4 @@ export function reconcilerChildren(returnFiber: Fiber, children: VNode | string 
       previousNewFiber = newFiber
     }
   }
-  //第二次遍历，会创建新的fiber对象
-}
-/**
- * 专门更新 lastPlacedIndex
- * @param newFiber
- * @param lastPlacedIndex
- * @param shouldTrackSideEffects
- */
-function placeChild(newFiber: Fiber, lastPlacedIndex: number, newIndex: number, shouldTrackSideEffects: boolean): number {
-  newFiber.index = newIndex
-  //初次渲染,不需要记录位置
-  if (!shouldTrackSideEffects) {
-    return lastPlacedIndex
-  }
-  //todo
-  return Infinity
 }

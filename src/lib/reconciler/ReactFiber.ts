@@ -51,6 +51,18 @@ export class Fiber {
    * 子树的更新flags
    */
   subtreeFlags: number = 0
+  /**
+   * 删除的子节点数组
+   */
+  deletions: Fiber[] = []
+  /**
+   * 根据不同Hook保存不同的数据
+   */
+  memoizedState: any = null
+  /**
+   * 副作用队列
+   */
+  updateQueue: any = []
   constructor({
     key = null,
     type,

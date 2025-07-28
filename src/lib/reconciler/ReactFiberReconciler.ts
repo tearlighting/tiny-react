@@ -1,4 +1,5 @@
 import { Component } from "../react"
+import { renderWithHooks } from "../react/ReactHooks"
 import { EFiberTags } from "../shared/constants"
 import { getHostParentFiber, isFunction } from "../shared/utils"
 import { reconcilerChildren } from "./ReactChildFiber"
@@ -29,6 +30,8 @@ export function reconcilerHostTextChildren(wip: Fiber | null) {}
 export function reconcilerFunctionComponentChildren(wip: Fiber | null) {
   //初次渲染
   if (wip && !wip?.stateNode && isFunction(wip.type)) {
+    //先处理hooks
+    renderWithHooks(wip)
     const children = wip.type(wip.props)
     //加入子节点fiber,不是递归所有，只是当前节点的子节点
     reconcilerChildren(wip, children)

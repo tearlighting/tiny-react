@@ -23,6 +23,8 @@ function workLoop(remainingTime: number) {
   //如果当前有正在工作的fiber对象，并且当前空闲时间还有剩余就执行，没有就退出
   while (wip) {
     if (remainingTime < 0) {
+      console.log("剩余时间不足，退出")
+
       return workLoop
     }
     //执行workLoop

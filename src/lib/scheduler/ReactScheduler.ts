@@ -49,7 +49,7 @@ function useMacroTask({ scheduler }: { scheduler: Heap<ITask> }) {
     while (task) {
       const now = performance.now()
       //如果还有剩余时间，而且没有空闲时间
-      if (task.expireTime > now && !hasTimeRemaining()) {
+      if (!hasTimeRemaining()) {
         break
       }
       const cb = task.callback
