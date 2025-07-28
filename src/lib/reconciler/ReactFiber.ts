@@ -1,4 +1,4 @@
-import { EFiberFlags, EFiberTags } from "../shared/constants"
+import { EClassComponent, EFiberFlags, EFiberTags } from "../shared/constants"
 import { isFunction, isStr, isUndefined } from "../shared/utils"
 
 export class Fiber {
@@ -47,6 +47,10 @@ export class Fiber {
    * 指向旧树上的fiber节点
    */
   alternate: Fiber | null
+  /**
+   * 子树的更新flags
+   */
+  subtreeFlags: number = 0
   constructor({
     key = null,
     type,
@@ -86,7 +90,7 @@ export function createFiber(vnode: ReactNode, returnFiber: Fiber) {
   if (isStr(type)) {
     tag = EFiberTags.HostComponent
   } else if (isFunction(type)) {
-    if (type.prototype && type.prototype.isReactComponent) {
+    if (type.prototype && type.prototype[EClassComponent.isReactComponent]) {
       tag = EFiberTags.ClassComponent
     } else {
       tag = EFiberTags.FunctionComponent
@@ -106,4 +110,15 @@ export function createFiber(vnode: ReactNode, returnFiber: Fiber) {
     tag,
     return: returnFiber,
   })
+}
+
+export function createRootFiber(root: HTMLElement, vnode: ReactNode) {
+  const rootNode = new Fiber({
+    stateNode: root,
+    type: root.nodeName.toLowerCase(),
+    tag: EFiberTags.HostRoot,
+  })
+  const fiberNode = createFiber(vnode, rootNode)
+  rootNode.child = fiberNode
+  return rootNode
 }

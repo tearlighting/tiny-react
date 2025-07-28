@@ -1,4 +1,4 @@
-import { createFiber, Fiber, scheduleUpdateOnFiber } from "../reconciler"
+import { createFiber, createRootFiber, Fiber, scheduleUpdateOnFiber } from "../reconciler"
 
 export class ReactDomRoot {
   constructor(private _internalRoot: HTMLElement) {}
@@ -15,16 +15,10 @@ export class ReactDomRoot {
 //更新容器
 function updateContainer(container: HTMLElement, children: ReactNode) {
   //todo
+  const rootNode = createRootFiber(container, children)
   //先生成父节点的fiblerNode,子Fiber在下面生成
-  const fiberNode = createFiber(
-    children,
-    new Fiber({
-      stateNode: container,
-      type: container.nodeName.toLowerCase(),
-    })
-  )
-  scheduleUpdateOnFiber(fiberNode)
-  console.log(fiberNode, children)
+  scheduleUpdateOnFiber(rootNode)
+  console.log(rootNode)
 }
 
 export const createRoot = (container: HTMLElement) => new ReactDomRoot(container)

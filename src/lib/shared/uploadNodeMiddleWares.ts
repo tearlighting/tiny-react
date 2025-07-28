@@ -72,7 +72,7 @@ export const defaultMiddleware: PatchMiddleware<PatchCtx> = (ctx) => {
 export const updateNodeMiddleWare = createMiddleWare<PatchCtx>()
   .use(eventMiddleware)
   .use(classMiddleware)
-  .use(refMiddleware)
+  // .use(refMiddleware)
   .use(htmlMiddleware)
   .use(valueMiddleware)
   .use(childrenMiddleware)
@@ -98,7 +98,7 @@ function patchClass(el: HTMLElement, prev: string, next: string) {
     }
   }
 }
-function patchRef(ref: Function | { current: any }, dom: HTMLElement | null) {
+export function patchRef(ref: Function | { current: any }, dom: HTMLElement | null) {
   if (!ref) return
   if (typeof ref === "function") {
     ref(dom)

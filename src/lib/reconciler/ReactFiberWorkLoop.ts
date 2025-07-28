@@ -1,6 +1,8 @@
+import { scheduleCallback } from "../scheduler"
 import type { Fiber } from "./ReactFiber"
 import { beginWork } from "./ReactFiberBeginWork"
-import { completeWork } from "./ReactFiberCommitWork"
+import { commitWork } from "./ReactFiberCommitWork"
+import { completeWork } from "./ReactFiberCompleteWork"
 /**
  * work in progress
  * 正在工作的fiber对象
@@ -14,12 +16,15 @@ export function scheduleUpdateOnFiber(fiber: Fiber) {
   wip = fiber
   wipRoot = fiber
   //空闲时间执行workLoop，之后替换为Scheduler
-  requestIdleCallback(workLoop)
+  scheduleCallback(workLoop)
 }
 
-function workLoop(deadline: IdleDeadline) {
-  //如果当前有正在工作的fiber对象，并且当前空闲时间还有剩余
-  while (wip && deadline.timeRemaining()) {
+function workLoop(remainingTime: number) {
+  //如果当前有正在工作的fiber对象，并且当前空闲时间还有剩余就执行，没有就退出
+  while (wip) {
+    if (remainingTime < 0) {
+      return workLoop
+    }
     //执行workLoop
     performUnitOfWork()
   }
@@ -36,6 +41,7 @@ function workLoop(deadline: IdleDeadline) {
  * 4.commit
  */
 function performUnitOfWork() {
+  console.log("performUnitOfWork")
   beginWork(wip)
   //深度优先子元素
   if (wip?.child) {
@@ -63,7 +69,7 @@ function performUnitOfWork() {
  * commit阶段
  */
 function commitRoot() {
-  completeWork(wipRoot)
+  commitWork(wipRoot)
   wip = null
   //   throw new Error("Function not implemented.")
 }

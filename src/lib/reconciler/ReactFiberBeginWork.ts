@@ -1,6 +1,7 @@
 import { EFiberTags } from "../shared/constants"
+import { isFiberTag } from "../shared/utils"
 import type { Fiber } from "./ReactFiber"
-import { updateHostComponent, updateHostText } from "./ReactFiberReconciler"
+import { reconcilerClassComponentChildren, reconcilerFunctionComponentChildren, reconcilerHostComponentChildren, reconcilerHostTextChildren } from "./ReactFiberReconciler"
 
 /**
  *
@@ -8,17 +9,19 @@ import { updateHostComponent, updateHostText } from "./ReactFiberReconciler"
  * 根据fiber的tag(class,function,原生的string,文本节点的undefined,Fragment等)来决定如何处理
  */
 export function beginWork(wip: Fiber | null) {
-  const tag = wip?.tag
-  ;(tag && tagsStrategy[tag]?.(wip)) || tagsStrategy.default()
+  if (!wip) return
+  const tag = wip.tag!
+  const func = (isFiberTag(tag) ? tagsStrategy[tag] : null) ?? tagsStrategy.default
+  func(wip)
 }
 
-const tagsStrategy: Record<EFiberTags, (wip: Fiber | null) => any> & {
-  default: () => any
+const tagsStrategy: Partial<Record<EFiberTags, (wip: Fiber | null) => any>> & {
+  default: (wip: Fiber | null) => any
 } = {
   default: () => {},
   [EFiberTags.Fragment]: () => {},
-  [EFiberTags.HostComponent]: updateHostComponent,
-  [EFiberTags.ClassComponent]: () => {},
-  [EFiberTags.FunctionComponent]: () => {},
-  [EFiberTags.HostText]: updateHostText,
+  [EFiberTags.HostComponent]: reconcilerHostComponentChildren,
+  [EFiberTags.ClassComponent]: reconcilerClassComponentChildren,
+  [EFiberTags.FunctionComponent]: reconcilerFunctionComponentChildren,
+  [EFiberTags.HostText]: reconcilerHostTextChildren,
 }
