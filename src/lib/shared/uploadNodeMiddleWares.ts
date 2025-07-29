@@ -1,5 +1,5 @@
 import { createMiddleWare, type PatchMiddleware } from "./middleWare"
-import { isStr } from "./utils"
+import { isTextNode } from "./utils"
 
 interface PatchCtx {
   key: string
@@ -59,8 +59,8 @@ export const valueMiddleware: PatchMiddleware<PatchCtx> = (ctx, next) => {
 export const childrenMiddleware: PatchMiddleware<PatchCtx> = (ctx, next) => {
   if (ctx.key !== EPatchType.children) return next()
   const child = ctx.nextVal.children
-  if (isStr(child)) {
-    ctx.node.textContent = child
+  if (isTextNode(child)) {
+    ctx.node.textContent = child as string
   }
 }
 export const defaultMiddleware: PatchMiddleware<PatchCtx> = (ctx) => {

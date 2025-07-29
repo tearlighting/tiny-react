@@ -60,9 +60,9 @@ export class Fiber {
    */
   memoizedState: any = null
   /**
-   * 副作用队列
+   * 副作用队列,自己这个fiber上要执行的副作用
    */
-  updateQueue: any = []
+  updateQueue: UpdateQueue = null
   constructor({
     key = null,
     type,
@@ -72,7 +72,7 @@ export class Fiber {
     sibling: sbibling = null,
     child = null,
     return: returnFiber = null,
-    flags = EFiberFlags.Placement,
+    flags = EFiberFlags.NoFlags,
     index = null,
     alternate = null,
   }: Partial<Omit<Fiber, "">>) {
@@ -125,12 +125,24 @@ export function createFiber(vnode: ReactNode, returnFiber: Fiber) {
 }
 
 export function createRootFiber(root: HTMLElement, vnode: ReactNode) {
-  const rootNode = new Fiber({
+  const rootNode = new FiberRoot({
+    current: null,
+    pendingChildren: null,
     stateNode: root,
-    type: root.nodeName.toLowerCase(),
-    tag: EFiberTags.HostRoot,
   })
-  const fiberNode = createFiber(vnode, rootNode)
-  rootNode.child = fiberNode
+  const fiberNode = createFiber(vnode, rootNode as any)
+  rootNode.pendingChildren = fiberNode
+  fiberNode.index = 0
   return rootNode
+}
+
+export class FiberRoot implements IFiberRoot {
+  current: Fiber
+  pendingChildren: Fiber | null
+  stateNode: HTMLElement
+  constructor({ current, pendingChildren, stateNode }: IFiberRoot) {
+    this.current = current
+    this.pendingChildren = pendingChildren
+    this.stateNode = stateNode
+  }
 }

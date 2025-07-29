@@ -11,3 +11,9 @@ type VNode = {
   key: string | null
   ref: any
 }
+
+interface IFiberRoot {
+  current: Fiber // 当前渲染完成的 Fiber 树根
+  pendingChildren: Fiber | null
+  stateNode: HTMLElement
+}

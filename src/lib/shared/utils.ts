@@ -1,8 +1,9 @@
-import type { Fiber } from "../reconciler"
+import type { Fiber, FiberRoot } from "../reconciler"
 import { EFiberTags, type EFiberFlags } from "./constants"
 import { updateNodeMiddleWare } from "./uploadNodeMiddleWares"
 
 export const isStr = (value: any): value is string => typeof value === "string"
+
 export const isUndefined = (value: any): value is undefined => value === undefined
 
 export const isFunction = (value: any): value is Function => typeof value === "function"
@@ -10,6 +11,8 @@ export const isFunction = (value: any): value is Function => typeof value === "f
 export const isNumber = (value: any): value is number => typeof value === "number"
 
 export const isFiberTag = (value: any): value is EFiberFlags => typeof value === "number"
+
+export const isTextNode = (value: any) => isStr(value) || isNumber(value)
 
 export function shallowEqual<T>(preVal: T, nextVal: T): boolean {
   if (!preVal || !nextVal) return false
@@ -110,7 +113,7 @@ export function updateNode(node: HTMLElement, preVal: NonNullable<Fiber["props"]
 
   //   }
   //想法二，直接上middleWare
-  if (shallowEqual(preVal, nextVal)) return
+  if (!preVal || !nextVal || shallowEqual(preVal, nextVal)) return
   const keys = new Set([...Object.keys(preVal), ...Object.keys(nextVal)])
 
   for (let key of keys) {
@@ -149,4 +152,12 @@ export const debonce = <TPorps extends string[]>(fn: (...args: TPorps) => void, 
       fn(...args)
     }, delay)
   }
+}
+
+export function getFiberRoot(fiber: Fiber | FiberRoot): FiberRoot {
+  let node: any = fiber
+  while (node.return) {
+    node = node.return
+  }
+  return node
 }

@@ -5,7 +5,7 @@ export default function App({ id }: { id: string }) {
     <ul className="test" id={id}>
       "1"
       <li>
-        <div>123</div>
+        <div>{id}</div>
         456
       </li>
       "2"

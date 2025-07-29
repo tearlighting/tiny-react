@@ -1,5 +1,6 @@
 import { scheduleCallback } from "../scheduler"
-import type { Fiber } from "./ReactFiber"
+import { getFiberRoot } from "../shared/utils"
+import { FiberRoot, type Fiber } from "./ReactFiber"
 import { beginWork } from "./ReactFiberBeginWork"
 import { commitWork } from "./ReactFiberCommitWork"
 import { completeWork } from "./ReactFiberCompleteWork"
@@ -11,10 +12,10 @@ let wip: Fiber | null = null
 /**
  * 根节点的wip对象
  */
-let wipRoot: Fiber | null = null
-export function scheduleUpdateOnFiber(fiber: Fiber) {
-  wip = fiber
-  wipRoot = fiber
+let wipRoot: FiberRoot | null = null
+export function scheduleUpdateOnFiber(fiber: Fiber | FiberRoot) {
+  wipRoot = getFiberRoot(fiber)
+  wip = wipRoot.pendingChildren
   //空闲时间执行workLoop，之后替换为Scheduler
   scheduleCallback(workLoop)
 }
@@ -24,7 +25,6 @@ function workLoop(remainingTime: number) {
   while (wip) {
     if (remainingTime < 0) {
       console.log("剩余时间不足，退出")
-
       return workLoop
     }
     //执行workLoop
@@ -43,7 +43,6 @@ function workLoop(remainingTime: number) {
  * 4.commit
  */
 function performUnitOfWork() {
-  console.log("performUnitOfWork")
   beginWork(wip)
   //深度优先子元素
   if (wip?.child) {
@@ -71,7 +70,9 @@ function performUnitOfWork() {
  * commit阶段
  */
 function commitRoot() {
-  commitWork(wipRoot)
+  if (!wipRoot || !wipRoot.pendingChildren) return
+  commitWork(wipRoot.pendingChildren)
+  ;[wipRoot.pendingChildren, wipRoot.current] = [null, wipRoot.pendingChildren]
   wip = null
   //   throw new Error("Function not implemented.")
 }
