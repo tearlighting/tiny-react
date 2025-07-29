@@ -23,7 +23,7 @@ function updateContainer(container: HTMLElement, children: ReactNode) {
   }
   //先生成父节点的fiblerNode,子Fiber在下面生成
   scheduleUpdateOnFiber(rootNode)
-  console.log(rootNode, children)
+  // console.log(rootNode, children)
 }
 
 export const createRoot = (container: HTMLElement) => new ReactDomRoot(container)

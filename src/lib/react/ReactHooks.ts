@@ -1,14 +1,14 @@
-import { scheduleUpdateOnFiber, type Fiber } from "../reconciler"
+import { type Fiber } from "../reconciler"
 /**
- * 当前正在渲染的 fiber
+ * 当前正在渲染的 FunctionComponent fiber
  */
-let currentlyRenderingFiber: Fiber | null = null
+export let currentlyRenderingFiber: Fiber | null = null
 /**
- * 当前正在处理的Hook
+ * 当前正在处理的Hook，就是靠它来生成hooks链表的
  */
 let workInProgressHook: Hook | null = null
 /**
- * 处理完成的Hook
+ * undate时，复用的当前hook
  */
 let currentHook: Hook | null = null
 export function renderWithHooks(wip: Fiber) {
@@ -18,64 +18,48 @@ export function renderWithHooks(wip: Fiber) {
   workInProgressHook = null
   currentlyRenderingFiber.updateQueue = []
 }
-/**
- *
- * @param reducer reducer函数,改变状态的纯函数
- * @param initialState 初始值
- */
-export function useReducer<T extends any>(reducer: ((state: T) => void) | null, initialState: T) {
-  const hook = updateWorkInProgressHook()
-  if (!currentlyRenderingFiber?.alternate) {
-    hook.memorizedState = initialState
+function cloneHook(currentHook: Hook): Hook {
+  return {
+    memorizedState: currentHook.memorizedState,
+    next: null,
+    // dispatch: currentHook.dispatch,
   }
-  const dispatch = (action: T) => {
-    dispatchReducerAction(currentlyRenderingFiber!, hook, reducer, action)
-  }
-  return [hook.memorizedState, dispatch]
 }
 /**
- * 获取一个hook对象，并使workInProgressHook指向最后一个hook
+ * 获取一个hook对象，并通过更新workInProgressHook来构建Hooks链表
  * @returns
  */
-function updateWorkInProgressHook(): Hook {
-  let hook: Hook | null = null
-  const current = currentlyRenderingFiber?.alternate
-  if (current) {
-    currentlyRenderingFiber!.memoizedState = current.memoizedState
+export function updateWorkInProgressHook(): Hook {
+  let hook: Hook
+
+  const current = currentlyRenderingFiber!.alternate
+  // Mount
+  if (!current) {
+    hook = { memorizedState: null, next: null }
+    //生成hooks链表
     if (workInProgressHook) {
-      workInProgressHook = hook = workInProgressHook.next!
-      currentHook = currentHook!.next!
+      //  //如果有就往后加
+      //  workInProgressHook.next = hook
+      //  //加完再往后移动
+      //  workInProgressHook = workInProgressHook.next
+      //可以简写为
+      workInProgressHook = workInProgressHook.next = hook
     } else {
-      workInProgressHook = hook = currentlyRenderingFiber?.memoizedState
-      currentHook = current.memoizedState
+      //一开始是空链表，直接挂上去
+      currentlyRenderingFiber!.memoizedState = workInProgressHook = hook
     }
   } else {
-    hook = {
-      memorizedState: null,
-      next: null,
-    }
+    //Update 阶段：复用 current.memoizedState 链表
+    //如果有值就拿下一个，没有值就从头开始
+    currentHook = currentHook?.next ?? current.memoizedState!
+    //copy current的值，避免diff阶段污染旧值
+    hook = cloneHook(currentHook)
     if (workInProgressHook) {
-      workInProgressHook.next = hook
+      workInProgressHook = workInProgressHook.next = hook
     } else {
-      currentlyRenderingFiber!.memoizedState = hook
+      workInProgressHook = currentlyRenderingFiber!.memoizedState = hook
     }
-    workInProgressHook = hook
   }
-  return {} as Hook
-}
-/**
- *根据reducer函数改变状态,处理Fiber对象
- * @param fiber 当前正在渲染的fiber
- * @param hook  当前正在处理的hook
- * @param reducer  reducer函数,改变状态的纯函数
- * @param action  如果没有，就是useState,传入值就是最终值
- */
-function dispatchReducerAction<T extends any>(fiber: Fiber, hook: Hook, reducer: ((state: T) => void) | null, action: T) {
-  //更新状态
-  hook.memorizedState = reducer ? reducer(hook.memorizedState) : action
-  //此fiber变成旧fiber,挂到alternate
-  fiber.alternate = { ...fiber }
-  //不去更新sibling,因为sibling的hook和当前hook不一样
-  fiber.sibling = null
-  scheduleUpdateOnFiber(fiber)
+
+  return hook
 }

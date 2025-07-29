@@ -1,4 +1,4 @@
-import { EFiberFlags, EFiberTags } from "../shared/constants"
+import { EFiberFlags } from "../shared/constants"
 import { patchRef } from "../shared/uploadNodeMiddleWares"
 import type { Fiber } from "./ReactFiber"
 import { appendAllChildren } from "./ReactFiberCompleteWork"

@@ -1,4 +1,4 @@
-interface Hook {
+interface Hook<T = any> {
   /**
    * The memorized state of the hook
    */

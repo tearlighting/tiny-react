@@ -56,9 +56,9 @@ export class Fiber {
    */
   deletions: Fiber[] = []
   /**
-   * 根据不同Hook保存不同的数据
+   * 根据不同Hook保存不同的数据,指向Hooks的根节点
    */
-  memoizedState: any = null
+  memoizedState: Hook | null = null
   /**
    * 副作用队列,自己这个fiber上要执行的副作用
    */

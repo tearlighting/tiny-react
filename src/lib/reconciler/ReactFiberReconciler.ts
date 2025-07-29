@@ -64,7 +64,6 @@ export function commitPlacement(fiber: Fiber) {
 export function commitDeletion(fiber: Fiber) {
   const deletions = fiber.deletions ?? []
   console.log("deletion:", [...deletions])
-
   for (let i of deletions) {
     removeFiber(i)
   }

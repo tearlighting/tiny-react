@@ -54,12 +54,14 @@ export function reconcilerChildren(returnFiber: Fiber, children: VNode | string 
    * @param oldFiber
    */
   function reuseAlternateFiber(newFiber: Fiber, oldFiber: Fiber) {
-    Object.assign<Fiber, Partial<Fiber>>(newFiber, {
-      //这是completeWork里面复用
-      // stateNode: oldFiber!.stateNode,
-      alternate: oldFiber,
-      //   flags: EFiberFlags.Update,
-    })
+    // Object.assign<Fiber, Partial<Fiber>>(newFiber, {
+    //   //这是completeWork里面复用
+    //   // stateNode: oldFiber!.stateNode,
+    //   alternate: oldFiber,
+    //   //   flags: EFiberFlags.Update,
+    // })
+    newFiber.alternate = oldFiber
+    oldFiber.alternate = newFiber
   }
   //mount
   if (!oldFiber) {
