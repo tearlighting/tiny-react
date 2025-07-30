@@ -1,6 +1,8 @@
 import { createElement } from "./lib/react-dom"
-import { TinyReact } from "./lib/react"
+import { TinyReact, useState } from "./lib/react"
+
 export default function App({ id }: { id: string }) {
+  const [count, setCount] = useState(0)
   return (
     <ul className="test" id={id}>
       "1"
@@ -8,7 +10,10 @@ export default function App({ id }: { id: string }) {
         <div>{id}</div>
         456
       </li>
-      "2"
+      <li>{count}</li>
+      <li>
+        <button onClick={() => setCount(count + 1)}>count: {count}</button>
+      </li>
     </ul>
   )
 }

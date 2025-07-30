@@ -28,7 +28,7 @@ export function reconcilerHostTextChildren(wip: Fiber | null) {}
  */
 export function reconcilerFunctionComponentChildren(wip: Fiber | null) {
   //初次渲染
-  if (wip && !wip?.stateNode && isFunction(wip.type)) {
+  if (wip && isFunction(wip.type)) {
     //先处理hooks
     renderWithHooks(wip)
     const children = wip.type(wip.props)

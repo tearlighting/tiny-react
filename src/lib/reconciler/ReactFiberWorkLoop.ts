@@ -16,6 +16,8 @@ let wipRoot: FiberRoot | null = null
 export function scheduleUpdateOnFiber(fiber: Fiber | FiberRoot) {
   wipRoot = getFiberRoot(fiber)
   wip = wipRoot.pendingChildren
+  console.log(wipRoot)
+
   //空闲时间执行workLoop，之后替换为Scheduler
   scheduleCallback(workLoop)
 }

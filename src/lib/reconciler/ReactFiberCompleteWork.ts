@@ -1,5 +1,5 @@
 import { EFiberFlags, EFiberTags } from "../shared/constants"
-import { getHostParentFiber, isTextNode, updateNode } from "../shared/utils"
+import { isTextNode, updateNode } from "../shared/utils"
 import type { Fiber } from "./ReactFiber"
 
 export function completeWork(wip: Fiber | null) {
@@ -35,7 +35,6 @@ const tagsCreateInstanceStrategy: Partial<Record<EFiberTags, (wip: Fiber) => any
   [EFiberTags.HostComponent]: (wip) => {
     //创建原生dom
     wip.stateNode = document.createElement(wip.type as string)
-    // //设置属性
   },
   [EFiberTags.ClassComponent]: () => {},
   [EFiberTags.FunctionComponent]: () => {},
@@ -139,4 +138,26 @@ const tagsUpdateComponetStrategy: Partial<Record<EFiberTags, (wip: Fiber) => any
       }
     }
   },
+}
+function processUpdateQueue<T>(fiber: Fiber, initialState: T): T {
+  const queue = fiber.updateQueue as FunctionUpdateQueue
+  if (!queue || !queue.pending) return initialState
+
+  let state = initialState
+  const first = queue.pending.next!
+  let update = first
+  do {
+    const action = update.action
+    state = action instanceof Function ? action(state) : action
+    update = update.next!
+  } while (update !== first)
+  queue.pending = null
+  return state
+}
+function updateFunctionComponent(wip: Fiber) {
+  // 用 updateQueue 计算新的 state
+  const newState = processUpdateQueue(wip, wip.memoizedState)
+  wip.memoizedState = newState
+
+  // 渲染 children ...
 }
