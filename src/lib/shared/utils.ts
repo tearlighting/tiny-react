@@ -27,7 +27,7 @@ export function shallowEqual<T>(preVal: T, nextVal: T): boolean {
   for (let i = 0; i < keysA.length; i++) {
     const key = keysA[i]
     if (!Object.prototype.hasOwnProperty.call(nextVal, key)) return false
-    if (!Object.is((preVal as any)[key], (nextVal as any)[key])) return false
+    if ((preVal as any)[key] !== (nextVal as any)[key]) return false
   }
   return true
 }
@@ -113,6 +113,7 @@ export function updateNode(node: HTMLElement, preVal: NonNullable<Fiber["props"]
 
   //   }
   //想法二，直接上middleWare
+
   if (!preVal || !nextVal || shallowEqual(preVal, nextVal)) return
   const keys = new Set([...Object.keys(preVal), ...Object.keys(nextVal)])
 
@@ -160,4 +161,8 @@ export function getFiberRoot(fiber: Fiber | FiberRoot): FiberRoot {
     node = node.return
   }
   return node
+}
+
+export function areHookInputsEqual(prevInputs: any[], nextInputs: any[]) {
+  return prevInputs.length === nextInputs.length && prevInputs.every((item, index) => Object.is(item, nextInputs[index]))
 }

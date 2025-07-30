@@ -2,6 +2,7 @@ import { renderWithHooks } from "../react/ReactHooks"
 import { EFiberTags } from "../shared/constants"
 import { getHostParentFiber, isFunction, updateNode } from "../shared/utils"
 import { reconcilerChildren } from "./ReactChildFiber"
+import { passiveEffects } from "./ReactEffects"
 import type { Fiber } from "./ReactFiber"
 
 /**
@@ -11,7 +12,7 @@ import type { Fiber } from "./ReactFiber"
  */
 export function reconcilerHostComponentChildren(wip: Fiber | null) {
   //初次渲染
-  if (wip && !wip?.stateNode) {
+  if (wip) {
     //加入子节点fiber,不是递归所有，只是当前节点的子节点
     reconcilerChildren(wip, wip.props?.children ?? [])
   }
@@ -27,12 +28,13 @@ export function reconcilerHostTextChildren(wip: Fiber | null) {}
  * @param wip
  */
 export function reconcilerFunctionComponentChildren(wip: Fiber | null) {
-  //初次渲染
   if (wip && isFunction(wip.type)) {
     //先处理hooks
     renderWithHooks(wip)
+
     const children = wip.type(wip.props)
-    console.log(children, wip)
+    // console.log(children)
+
     //加入子节点fiber,不是递归所有，只是当前节点的子节点
     reconcilerChildren(wip, children)
   }
@@ -69,21 +71,21 @@ export function commitDeletion(fiber: Fiber) {
   }
 }
 
-function updateProperties(dom: HTMLElement, updates: HostUpdateQueue) {
+function updateProperties(dom: HTMLElement, oldProps: Record<string, any>, updates: HostUpdateQueue) {
   const res = Object.fromEntries(updates)
-  updateNode(dom, {}, res)
+  updateNode(dom, oldProps, res)
 }
 export function commitUpdate(fiber: Fiber) {
   const strategy: Partial<Record<EFiberTags, (wip: Fiber) => any>> = {
     [EFiberTags.HostComponent]: (wip) => {
       const dom = wip.stateNode as HTMLElement
       const updates = wip.updateQueue ?? ([] as HostUpdateQueue)
-      updateProperties(dom, updates)
+      updateProperties(dom, wip.alternate?.props ?? {}, updates)
     },
     [EFiberTags.HostText]: (wip) => {
       const dom = wip.stateNode as HTMLElement
       const updates = wip.updateQueue as TextUpdateQueue
-      console.log(wip, wip.alternate?.props?.children)
+      //   console.log(wip, wip.alternate?.props?.children)
       dom.nodeValue = updates
     },
   }
@@ -101,4 +103,23 @@ function removeFiber(fiber: Fiber) {
       child = child.sibling
     }
   }
+}
+
+export function commitPassiveEffect(fiber: Fiber) {
+  const effectList = fiber.effectList || []
+  passiveEffects.push(...effectList)
+}
+
+/**
+ * 为mount阶段收集effectList
+ * @param fiber
+ * @returns
+ */
+export function collectPassiveEffects(fiber: Fiber | null) {
+  if (!fiber) return
+  if (fiber.tag === EFiberTags.FunctionComponent && fiber.effectList) {
+    passiveEffects.push(...fiber.effectList)
+  }
+  collectPassiveEffects(fiber.child)
+  collectPassiveEffects(fiber.sibling)
 }

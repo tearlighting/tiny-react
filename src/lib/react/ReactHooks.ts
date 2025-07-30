@@ -10,7 +10,7 @@ let workInProgressHook: Hook | null = null
 /**
  * undate时，复用的当前hook
  */
-let currentHook: Hook | null = null
+export let currentHook: Hook | null = null
 export function renderWithHooks(wip: Fiber) {
   //初始化
   currentlyRenderingFiber = wip
@@ -18,10 +18,11 @@ export function renderWithHooks(wip: Fiber) {
   workInProgressHook = null
   currentlyRenderingFiber.updateQueue = []
 }
-function cloneHook(currentHook: Hook): Hook {
+function cloneHook(hook: Hook): Hook {
   return {
-    memorizedState: currentHook.memorizedState,
+    memorizedState: hook.memorizedState,
     next: null,
+    updateQueue: hook.updateQueue,
     // dispatch: currentHook.dispatch,
   }
 }
@@ -33,9 +34,10 @@ export function updateWorkInProgressHook(): Hook {
   let hook: Hook
 
   const current = currentlyRenderingFiber!.alternate
+
   // Mount
   if (!current) {
-    hook = { memorizedState: null, next: null }
+    hook = { memorizedState: null, next: null, updateQueue: { pending: null } }
     //生成hooks链表
     if (workInProgressHook) {
       //  //如果有就往后加
@@ -60,6 +62,22 @@ export function updateWorkInProgressHook(): Hook {
       workInProgressHook = currentlyRenderingFiber!.memoizedState = hook
     }
   }
-
+  //消费hook的updateQueue,生成新的memoriedState
+  processUpdateQueue(hook)
   return hook
+}
+
+function processUpdateQueue<T>(hook: Hook<T>) {
+  if (hook.updateQueue?.pending) {
+    let update = hook.updateQueue.pending.next!
+    let state = hook.memorizedState
+    do {
+      const action = update.action
+      state = action instanceof Function ? action(state) : action
+      update = update.next!
+    } while (update !== hook.updateQueue.pending.next)
+    hook.memorizedState = state
+
+    hook.updateQueue.pending = null // 清空队列
+  }
 }

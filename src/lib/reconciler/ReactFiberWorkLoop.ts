@@ -1,6 +1,7 @@
 import { scheduleCallback } from "../scheduler"
 import { getFiberRoot } from "../shared/utils"
-import { FiberRoot, type Fiber } from "./ReactFiber"
+import { flushPassiveEffects } from "./ReactEffects"
+import { Fiber, FiberRoot } from "./ReactFiber"
 import { beginWork } from "./ReactFiberBeginWork"
 import { commitWork } from "./ReactFiberCommitWork"
 import { completeWork } from "./ReactFiberCompleteWork"
@@ -15,9 +16,9 @@ let wip: Fiber | null = null
 let wipRoot: FiberRoot | null = null
 export function scheduleUpdateOnFiber(fiber: Fiber | FiberRoot) {
   wipRoot = getFiberRoot(fiber)
-  wip = wipRoot.pendingChildren
-  console.log(wipRoot)
+  console.log("scheduleUpdateOnFiber", wipRoot)
 
+  wip = wipRoot.pendingChildren
   //空闲时间执行workLoop，之后替换为Scheduler
   scheduleCallback(workLoop)
 }
@@ -26,7 +27,7 @@ function workLoop(remainingTime: number) {
   //如果当前有正在工作的fiber对象，并且当前空闲时间还有剩余就执行，没有就退出
   while (wip) {
     if (remainingTime < 0) {
-      console.log("剩余时间不足，退出")
+      //   console.log("剩余时间不足，退出")
       return workLoop
     }
     //执行workLoop
@@ -74,7 +75,25 @@ function performUnitOfWork() {
 function commitRoot() {
   if (!wipRoot || !wipRoot.pendingChildren) return
   commitWork(wipRoot.pendingChildren)
-  ;[wipRoot.pendingChildren, wipRoot.current] = [null, wipRoot.pendingChildren]
+  wipRoot.current = wipRoot.pendingChildren
+
+  wipRoot.pendingChildren = createWorkInProgress(wipRoot.current)
+  wipRoot.pendingChildren.return = wipRoot as any
+  setTimeout(flushPassiveEffects)
   wip = null
   //   throw new Error("Function not implemented.")
+}
+
+function createWorkInProgress(fiber: Fiber) {
+  const res = new Fiber({
+    tag: fiber.tag,
+    props: fiber.props,
+    type: fiber.type,
+    key: fiber.key,
+    index: fiber.index,
+    memoizedState: fiber.memoizedState,
+  })
+  res.alternate = fiber
+  fiber.alternate = res
+  return res
 }

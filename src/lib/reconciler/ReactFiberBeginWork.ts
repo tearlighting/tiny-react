@@ -1,5 +1,6 @@
 import { EFiberTags } from "../shared/constants"
 import { isFiberTag } from "../shared/utils"
+import { bailoutOnAlreadyFinishedWork } from "./ReactBailout"
 import type { Fiber } from "./ReactFiber"
 import { reconcilerClassComponentChildren, reconcilerFunctionComponentChildren, reconcilerHostComponentChildren, reconcilerHostTextChildren } from "./ReactFiberReconciler"
 
@@ -10,6 +11,8 @@ import { reconcilerClassComponentChildren, reconcilerFunctionComponentChildren, 
  */
 export function beginWork(wip: Fiber | null) {
   if (!wip) return
+  //预留剪枝优化diff位置
+  if (bailoutOnAlreadyFinishedWork(wip)) return
   const tag = wip.tag!
   const func = (isFiberTag(tag) ? tagsStrategy[tag] : null) ?? tagsStrategy.default
   func(wip)

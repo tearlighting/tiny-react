@@ -56,13 +56,21 @@ export class Fiber {
    */
   deletions: Fiber[] = []
   /**
-   * 根据不同Hook保存不同的数据,指向Hooks的根节点
+   * 根据不同Hook保存不同的数据,指向Hooks的根节点,在ReactHook那边用
    */
   memoizedState: Hook | null = null
   /**
    * 副作用队列,自己这个fiber上要执行的副作用
    */
   updateQueue: UpdateQueue = null
+  /**
+   * 副作用的收集（收集useEffect）
+   */
+  effectList?: Effect[]
+  /**
+   * 副作用收集（收集useLayoutEffect）
+   */
+  layoutEffectList?: Effect[]
   constructor({
     key = null,
     type,

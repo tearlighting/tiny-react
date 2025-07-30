@@ -1,8 +1,8 @@
-import { EFiberFlags } from "../shared/constants"
+import { EFiberFlags, EFiberTags } from "../shared/constants"
 import { patchRef } from "../shared/uploadNodeMiddleWares"
 import type { Fiber } from "./ReactFiber"
 import { appendAllChildren } from "./ReactFiberCompleteWork"
-import { commitDeletion, commitPlacement, commitUpdate } from "./ReactFiberReconciler"
+import { collectPassiveEffects, commitDeletion, commitPassiveEffect, commitPlacement, commitUpdate } from "./ReactFiberReconciler"
 
 /**
  * mount阶段直接挂到根节点
@@ -15,6 +15,7 @@ export function commitWork(fiber: Fiber | null) {
   //初次渲染Mount,直接加入root
   if (!fiber.alternate) {
     appendAllChildren(fiber.return!.stateNode!, fiber.child)
+    collectPassiveEffects(fiber)
   } else {
     // 1️⃣ 如果当前节点和子树都没有副作用 → 直接返回
     if (!(fiber.flags === 0 && fiber.subtreeFlags === 0)) {
@@ -45,11 +46,16 @@ function mutation(fiber: Fiber) {
     commitPlacement(fiber)
   }
   if (fiber.flags & EFiberFlags.Update) {
-    console.log(fiber.flags & EFiberFlags.Update, fiber)
+    // console.log(fiber.flags & EFiberFlags.Update, fiber)
     commitUpdate(fiber)
   }
   if (fiber.flags & EFiberFlags.Deletion) {
     commitDeletion(fiber)
+  }
+  if (fiber.tag === EFiberTags.FunctionComponent) {
+    console.log(fiber)
+
+    commitPassiveEffect(fiber)
   }
 }
 

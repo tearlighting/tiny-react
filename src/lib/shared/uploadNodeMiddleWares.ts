@@ -1,4 +1,4 @@
-import { createMiddleWare, type PatchMiddleware } from "./middleWare"
+import { createMiddleWare, type PatchMiddleware } from "./MiddleWare"
 import { isTextNode } from "./utils"
 
 interface PatchCtx {
