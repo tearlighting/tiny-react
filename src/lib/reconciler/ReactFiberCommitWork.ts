@@ -1,8 +1,9 @@
-import { EFiberFlags, EFiberTags } from "../shared/constants"
+import { EEffectTag, EFiberFlags, EFiberTags } from "../shared/constants"
 import { patchRef } from "../shared/uploadNodeMiddleWares"
+import { flushEffects, getFiberRoot } from "../shared/utils"
 import type { Fiber } from "./ReactFiber"
 import { appendAllChildren } from "./ReactFiberCompleteWork"
-import { collectPassiveEffects, commitDeletion, commitPassiveEffect, commitPlacement, commitUpdate } from "./ReactFiberReconciler"
+import { commitDeletion, commitPlacement, commitUpdate } from "./ReactFiberReconciler"
 
 /**
  * mount阶段直接挂到根节点
@@ -15,9 +16,11 @@ export function commitWork(fiber: Fiber | null) {
   //初次渲染Mount,直接加入root
   if (!fiber.alternate) {
     appendAllChildren(fiber.return!.stateNode!, fiber.child)
-    collectPassiveEffects(fiber)
+    const wipRoot = getFiberRoot(fiber)
+    commitAttachRef(wipRoot.pendingChildren)
+    // flushEffects(wipRoot.updateQueue, [EEffectTag.layoutEffect, EEffectTag.imperativeHandle])
   } else {
-    // 1️⃣ 如果当前节点和子树都没有副作用 → 直接返回
+    //  如果当前节点和子树都没有副作用 → 直接返回
     if (!(fiber.flags === 0 && fiber.subtreeFlags === 0)) {
       beforeMutation(fiber)
       mutation(fiber)
@@ -36,11 +39,14 @@ function beforeMutation(fiber: Fiber) {
   // }
   // 2. 预留：清理旧 ref
   if (fiber.flags! & EFiberFlags.Ref) {
-    patchRef(fiber.alternate?.props?.ref, null)
+    patchRef(fiber.alternate?.ref!, null)
   }
   // 3. 其他需要在 DOM 改变前做的事
 }
-
+/**
+ * 为flags更新dom
+ * @param fiber
+ */
 function mutation(fiber: Fiber) {
   if (fiber.flags & EFiberFlags.Placement) {
     commitPlacement(fiber)
@@ -50,18 +56,33 @@ function mutation(fiber: Fiber) {
     commitUpdate(fiber)
   }
   if (fiber.flags & EFiberFlags.Deletion) {
-    commitDeletion(fiber)
-  }
-  if (fiber.tag === EFiberTags.FunctionComponent) {
     console.log(fiber)
 
-    commitPassiveEffect(fiber)
+    commitDeletion(fiber)
   }
 }
-
+/**
+ *
+ * @param fiber
+ * dom操作完成，开始绑定新ref，同步触发layoutEffect中有副作用，还有同步的useImperativeHandle
+ */
 function layout(fiber: Fiber) {
   if (fiber.flags & EFiberFlags.Ref) {
     // 绑定新 ref
-    patchRef(fiber.props!.ref, fiber.stateNode)
+    patchRef(fiber.ref!, fiber.stateNode)
+  }
+  //确实是layou阶段执行的，但是我这里是递归的，会执行多次，我就放双缓冲交互前去了
+  //   const wipRoot = getFiberRoot(fiber)!
+  //   flushEffects(wipRoot.updateQueue, [EEffectTag.layoutEffect, EEffectTag.imperativeHandle])
+}
+
+//mount阶段绑定ref
+function commitAttachRef(fiber: Fiber | null) {
+  while (fiber) {
+    if (fiber.tag === EFiberTags.HostComponent && fiber.ref) {
+      patchRef(fiber.ref, fiber.stateNode)
+    }
+    commitAttachRef(fiber.child)
+    fiber = fiber.sibling
   }
 }

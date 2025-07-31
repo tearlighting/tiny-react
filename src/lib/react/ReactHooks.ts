@@ -1,4 +1,5 @@
 import { type Fiber } from "../reconciler"
+import { cloneHook } from "../shared/utils"
 /**
  * 当前正在渲染的 FunctionComponent fiber
  */
@@ -16,16 +17,9 @@ export function renderWithHooks(wip: Fiber) {
   currentlyRenderingFiber = wip
   currentlyRenderingFiber.memoizedState = null
   workInProgressHook = null
-  currentlyRenderingFiber.updateQueue = []
+  currentlyRenderingFiber.updateQueue = null
 }
-function cloneHook(hook: Hook): Hook {
-  return {
-    memorizedState: hook.memorizedState,
-    next: null,
-    updateQueue: hook.updateQueue,
-    // dispatch: currentHook.dispatch,
-  }
-}
+
 /**
  * 获取一个hook对象，并通过更新workInProgressHook来构建Hooks链表
  * @returns

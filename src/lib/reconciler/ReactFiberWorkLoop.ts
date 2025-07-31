@@ -1,6 +1,7 @@
 import { scheduleCallback } from "../scheduler"
-import { getFiberRoot } from "../shared/utils"
-import { flushPassiveEffects } from "./ReactEffects"
+import { EEffectTag, EFiberFlags } from "../shared/constants"
+import { flushEffects, getFiberRoot } from "../shared/utils"
+
 import { Fiber, FiberRoot } from "./ReactFiber"
 import { beginWork } from "./ReactFiberBeginWork"
 import { commitWork } from "./ReactFiberCommitWork"
@@ -75,11 +76,18 @@ function performUnitOfWork() {
 function commitRoot() {
   if (!wipRoot || !wipRoot.pendingChildren) return
   commitWork(wipRoot.pendingChildren)
+  /**
+   * commit阶段，执行副作用,只是我里面是递归，我只好提出来了
+   */
+  flushEffects(wipRoot.updateQueue, [EEffectTag.layoutEffect, EEffectTag.imperativeHandle, EEffectTag.syncExternalStore])
   wipRoot.current = wipRoot.pendingChildren
-
   wipRoot.pendingChildren = createWorkInProgress(wipRoot.current)
   wipRoot.pendingChildren.return = wipRoot as any
-  setTimeout(flushPassiveEffects)
+  const rootEffects = wipRoot.updateQueue as Effect | null
+  setTimeout(() => {
+    flushEffects(rootEffects, [EEffectTag.passiveEffect])
+  })
+  wipRoot!.updateQueue = null
   wip = null
   //   throw new Error("Function not implemented.")
 }

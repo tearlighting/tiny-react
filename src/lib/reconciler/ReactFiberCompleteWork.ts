@@ -1,6 +1,6 @@
 import { EFiberFlags, EFiberTags } from "../shared/constants"
-import { isTextNode, updateNode } from "../shared/utils"
-import type { Fiber } from "./ReactFiber"
+import { getFiberRoot, getHostFunctionComponentFiber, isTextNode, mergeEffectQueues, updateNode } from "../shared/utils"
+import type { Fiber, FiberRoot } from "./ReactFiber"
 
 export function completeWork(wip: Fiber | null) {
   if (!wip) return
@@ -13,14 +13,16 @@ export function completeWork(wip: Fiber | null) {
     //apendChild 也是只加一层
     if (wip.stateNode && tag === EFiberTags.HostComponent) {
       appendAllChildren(wip.stateNode as HTMLElement, wip.child)
-      //加属性
     }
+    //加属性
     finalizeInitialChildren(wip)
   } else {
     //更新路径：复用dom,diffProps打update的标记
     tagsUpdateComponetStrategy[tag]?.(wip)
+    //标记Ref的更新
+    markRef(wip)
   }
-  //收集副作用，将子节点的flags标记到父节点上
+  //收集副作用EffectList到Root，将子节点的flags标记到父节点上
   bubbleProperties(wip)
 }
 function finalizeInitialChildren(wip: Fiber) {
@@ -62,17 +64,41 @@ export function appendAllChildren(parent: HTMLElement, child: Fiber | null) {
     child = child.sibling
   }
 }
-
+/**
+ * 收集副作用EffectList到Root，将子节点的flags标记到父节点上
+ * @param wip
+ */
 function bubbleProperties(wip: Fiber) {
-  let child = wip.child
+  //   let root: FiberRoot | null = null
+  //   if (wip.tag === EFiberTags.FunctionComponent && wip.effectList && wip.effectList.length) {
+  //     root = getFiberRoot(wip)
+  //     root.pendingPassiveEffects.push(...wip.effectList)
+  //   }
+  //   if (wip.tag === EFiberTags.FunctionComponent && wip.layoutEffectList && wip.layoutEffectList.length) {
+  //     root = root ?? getFiberRoot(wip)
+  //     root.pendingLayoutEffects.push(...wip.layoutEffectList)
+  //   }
+  let effectQueue: Effect | null = null
+  let child = wip.child ?? (wip as unknown as FiberRoot).pendingChildren
   let subtreeFlags = 0
   while (child) {
     subtreeFlags |= child.subtreeFlags
     subtreeFlags |= child.flags
-    child.return = wip
+
+    if (child.tag === EFiberTags.FunctionComponent || child.tag === EFiberTags.ForwardRef) {
+      effectQueue = mergeEffectQueues(effectQueue, child.updateQueue)
+    }
     child = child.sibling
   }
   wip.subtreeFlags |= subtreeFlags
+  if (wip.tag === EFiberTags.FunctionComponent || wip.tag === EFiberTags.ForwardRef) {
+    if (effectQueue) wip.updateQueue = mergeEffectQueues(wip.updateQueue as Effect, effectQueue)
+  } else {
+    const host = getHostFunctionComponentFiber(wip)
+    if (host && effectQueue) {
+      host.updateQueue = mergeEffectQueues(host.updateQueue as Effect, effectQueue)
+    }
+  }
 }
 
 /**
@@ -84,6 +110,13 @@ function reuseDom(wip: Fiber, current: Fiber) {
   wip.stateNode = current.stateNode
 }
 
+function markRef(wip: Fiber) {
+  if (wip.tag === EFiberTags.HostComponent || wip.tag === EFiberTags.FunctionComponent) {
+    if (wip.ref) {
+      wip.flags |= EFiberFlags.Ref
+    }
+  }
+}
 /**
  * 复用dom,diffProps打update的标记
  * @param current
@@ -97,7 +130,6 @@ function updateHostComponent(current: Fiber, wip: Fiber) {
 
   //diffProps
   const updatePayload = diffProps(oldProps, newProps)
-
   if (updatePayload) {
     wip.updateQueue = updatePayload
     wip.flags |= EFiberFlags.Update

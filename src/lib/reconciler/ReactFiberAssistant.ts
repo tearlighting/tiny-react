@@ -59,6 +59,8 @@ export function deleteRemainingChildren(returnFiber: Fiber, currentFirstChild: F
   }
 }
 function deleteChild(returnFiber: Fiber, childToDelete: Fiber) {
+  console.log("deletion")
+
   childToDelete.flags |= EFiberFlags.Deletion
   returnFiber.deletions = returnFiber.deletions || []
   returnFiber.deletions.push(childToDelete)

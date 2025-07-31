@@ -107,6 +107,7 @@ export function reconcilerChildren(returnFiber: Fiber, children: VNode | string 
       }
       //可以复用
       const newFiber = createFiber(newChildrenVNode, returnFiber)
+
       reuseAlternateFiber(newFiber, oldFiber!)
       lastPlacedIndex = placeChild(newFiber, lastPlacedIndex, i, shouldTrackSideEffects)
       linkFiber(newFiber)
@@ -117,7 +118,7 @@ export function reconcilerChildren(returnFiber: Fiber, children: VNode | string 
     //该创建的都创建了
     if (i === newChildren.length) {
       //删除多余的
-      deleteRemainingChildren(returnFiber, oldFiber)
+      oldFiber && deleteRemainingChildren(returnFiber, oldFiber)
     } else {
       //第二次遍历
       //新增的没有创建完，需要建Map查找子节点

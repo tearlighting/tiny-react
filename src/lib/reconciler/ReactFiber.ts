@@ -1,7 +1,8 @@
-import { EClassComponent, EFiberFlags, EFiberTags } from "../shared/constants"
+import { EClassComponent, EFiberFlags, EFiberTags, FORWARD_REF } from "../shared/constants"
 import { isFunction, isStr, isUndefined } from "../shared/utils"
 
 export class Fiber {
+  ref: VNode["ref"] | null
   /**
    * vnode上的key，直接拿
    */
@@ -48,7 +49,7 @@ export class Fiber {
    */
   alternate: Fiber | null
   /**
-   * 子树的更新flags
+   * 子树的冒泡的flags
    */
   subtreeFlags: number = 0
   /**
@@ -60,17 +61,17 @@ export class Fiber {
    */
   memoizedState: Hook | null = null
   /**
-   * 副作用队列,自己这个fiber上要执行的副作用
+   * 副作用队列,要冒泡。 自己这个fiber上要执行的副作用.约定updateQueue指向环形链表的最后一个节点，next指向第一个
    */
   updateQueue: UpdateQueue = null
-  /**
-   * 副作用的收集（收集useEffect）
-   */
-  effectList?: Effect[]
-  /**
-   * 副作用收集（收集useLayoutEffect）
-   */
-  layoutEffectList?: Effect[]
+  // /**
+  //  * 副作用的收集（收集useEffect）
+  //  */
+  // effectList?: Effect[]
+  // /**
+  //  * 副作用收集（收集useLayoutEffect）
+  //  */
+  // layoutEffectList?: Effect[]
   constructor({
     key = null,
     type,
@@ -83,6 +84,7 @@ export class Fiber {
     flags = EFiberFlags.NoFlags,
     index = null,
     alternate = null,
+    ref = null,
   }: Partial<Omit<Fiber, "">>) {
     this.key = key
     this.type = type
@@ -95,6 +97,7 @@ export class Fiber {
     this.flags = flags
     this.index = index
     this.alternate = alternate
+    this.ref = ref
   }
 }
 
@@ -113,7 +116,11 @@ export function createFiber(vnode: ReactNode, returnFiber: Fiber) {
     if (type.prototype && type.prototype[EClassComponent.isReactComponent]) {
       tag = EFiberTags.ClassComponent
     } else {
-      tag = EFiberTags.FunctionComponent
+      if (type.$$typeof === FORWARD_REF) {
+        tag = EFiberTags.ForwardRef
+      } else {
+        tag = EFiberTags.FunctionComponent
+      }
     }
   }
   //文本节点
@@ -127,6 +134,7 @@ export function createFiber(vnode: ReactNode, returnFiber: Fiber) {
     key: vnode.key,
     type: vnode.type,
     props: tag === EFiberTags.HostText ? { children: vnode } : vnode.props,
+    ref: vnode.ref,
     tag,
     return: returnFiber,
   })
@@ -148,6 +156,9 @@ export class FiberRoot implements IFiberRoot {
   current: Fiber
   pendingChildren: Fiber | null
   stateNode: HTMLElement
+  pendingPassiveEffects: Effect[] = []
+  pendingLayoutEffects: Effect[] = []
+  updateQueue: Effect | null = null
   constructor({ current, pendingChildren, stateNode }: IFiberRoot) {
     this.current = current
     this.pendingChildren = pendingChildren

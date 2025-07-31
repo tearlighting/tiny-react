@@ -1,8 +1,9 @@
 import { renderWithHooks } from "../react/ReactHooks"
-import { EFiberTags } from "../shared/constants"
+import { EFiberFlags, EFiberTags } from "../shared/constants"
+import { patchRef } from "../shared/uploadNodeMiddleWares"
 import { getHostParentFiber, isFunction, updateNode } from "../shared/utils"
 import { reconcilerChildren } from "./ReactChildFiber"
-import { passiveEffects } from "./ReactEffects"
+
 import type { Fiber } from "./ReactFiber"
 
 /**
@@ -32,7 +33,7 @@ export function reconcilerFunctionComponentChildren(wip: Fiber | null) {
     //先处理hooks
     renderWithHooks(wip)
 
-    const children = wip.type(wip.props)
+    const children = wip.tag === EFiberTags.ForwardRef ? wip.type(wip.props, wip.ref) : wip.type(wip.props)
     // console.log(children)
 
     //加入子节点fiber,不是递归所有，只是当前节点的子节点
@@ -103,23 +104,4 @@ function removeFiber(fiber: Fiber) {
       child = child.sibling
     }
   }
-}
-
-export function commitPassiveEffect(fiber: Fiber) {
-  const effectList = fiber.effectList || []
-  passiveEffects.push(...effectList)
-}
-
-/**
- * 为mount阶段收集effectList
- * @param fiber
- * @returns
- */
-export function collectPassiveEffects(fiber: Fiber | null) {
-  if (!fiber) return
-  if (fiber.tag === EFiberTags.FunctionComponent && fiber.effectList) {
-    passiveEffects.push(...fiber.effectList)
-  }
-  collectPassiveEffects(fiber.child)
-  collectPassiveEffects(fiber.sibling)
 }

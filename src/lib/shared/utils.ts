@@ -1,5 +1,5 @@
 import type { Fiber, FiberRoot } from "../reconciler"
-import { EFiberTags, type EFiberFlags } from "./constants"
+import { EEffectTag, EFiberFlags, EFiberTags } from "./constants"
 import { updateNodeMiddleWare } from "./uploadNodeMiddleWares"
 
 export const isStr = (value: any): value is string => typeof value === "string"
@@ -142,6 +142,24 @@ export function getHostParentFiber(fiber: Fiber): Fiber | null {
   }
   return null
 }
+/**
+ * 获取上一层的FunctionComponent,或者root,冒泡用
+ * @param fiber
+ * @returns
+ */
+export function getHostFunctionComponentFiber(fiber: Fiber | FiberRoot | null) {
+  if (!fiber) return fiber
+  if ((fiber as FiberRoot).pendingChildren) return fiber
+  const tag = (fiber as Fiber).tag
+  if (tag === EFiberTags.ForwardRef || tag === EFiberTags.FunctionComponent) {
+    return fiber
+  }
+  return getHostFunctionComponentFiber((fiber as Fiber).return!)
+}
+
+export function isFn(value: any): value is Function {
+  return typeof value === "function"
+}
 
 export const debonce = <TPorps extends string[]>(fn: (...args: TPorps) => void, delay = 10) => {
   let timer: number | null = null
@@ -165,4 +183,90 @@ export function getFiberRoot(fiber: Fiber | FiberRoot): FiberRoot {
 
 export function areHookInputsEqual(prevInputs: any[], nextInputs: any[]) {
   return prevInputs.length === nextInputs.length && prevInputs.every((item, index) => Object.is(item, nextInputs[index]))
+}
+
+// /**
+//  * 执行effect并清空
+//  * @param effects
+//  */
+// export function flushEffects(effects: Effect[] = []) {
+//   effects.forEach((effect) => {
+//     effect.destroy?.()
+//     const cleanup = effect.create()
+//     if (typeof cleanup === "function") {
+//       effect.destroy = cleanup
+//     }
+//   })
+//   effects.length = 0
+// }
+
+/**
+ * 为fiber的updateQueue生成Effect的环形链表，代替数组的effectList
+ * @param fiber
+ * @param effect
+ */
+export function pushEffect(fiber: Fiber, effect: Effect) {
+  const updateQueue = fiber.updateQueue as Effect | undefined
+  if (!updateQueue) {
+    effect.next = effect
+    fiber.updateQueue = effect
+  } else {
+    const first = updateQueue.next!
+    //当前节点后面加一个
+    updateQueue.next = effect
+    //最后一个节点指向第一个节点
+    effect.next = first
+    //将updateQueue指向最后一个节点
+    fiber.updateQueue = effect
+  }
+}
+/**
+ * 把b拼到尾部
+ * @param a
+ * @param b
+ * @returns
+ */
+export function mergeEffectQueues(a: Effect | null, b: Effect | null): Effect | null {
+  if (!a) return b
+  if (!b) return a
+
+  // 拼接两个环形链表
+  const aNext = a.next!
+  const bNext = b.next!
+  a.next = bNext
+  b.next = aNext
+  return b // 返回最新尾部
+}
+
+export function flushEffects(update: Effect | null, types: EEffectTag[]) {
+  if (!update) return
+  const first = update.next!
+  let e = first
+  do {
+    if (types.includes(e.tag)) {
+      //   console.log(e)
+
+      e.destroy?.()
+      const cleanup = e.create()
+      if (typeof cleanup === "function") e.destroy = cleanup
+    }
+    e = e.next!
+  } while (e !== first)
+}
+export function cloneHook(hook: Hook): Hook {
+  return {
+    memorizedState: hook.memorizedState,
+    next: null,
+    updateQueue: hook.updateQueue,
+    // dispatch: currentHook.dispatch,
+  }
+}
+
+export function cloneEffect(effect: Effect): Effect {
+  return {
+    tag: effect.tag,
+    create: effect.create,
+    destroy: effect.destroy,
+    next: effect.next,
+  }
 }

@@ -27,4 +27,5 @@ const tagsStrategy: Partial<Record<EFiberTags, (wip: Fiber | null) => any>> & {
   [EFiberTags.ClassComponent]: reconcilerClassComponentChildren,
   [EFiberTags.FunctionComponent]: reconcilerFunctionComponentChildren,
   [EFiberTags.HostText]: reconcilerHostTextChildren,
+  [EFiberTags.ForwardRef]: reconcilerFunctionComponentChildren,
 }

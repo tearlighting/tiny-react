@@ -19,7 +19,7 @@ export const enum EFiberFlags {
   /**
    * 需要更新Ref
    */
-  Ref = 0b0000000000000000000001000,
+  Ref = 0b0000000000000000000010000,
 }
 
 export const enum EFiberTags {
@@ -29,6 +29,7 @@ export const enum EFiberTags {
   HostText = 6,
   Fragment = 7,
   HostRoot = 3,
+  ForwardRef = 10,
 }
 
 export const enum EClassComponent {
@@ -42,3 +43,12 @@ export const enum EPriorityLevel {
   Low = 300,
   Idle = 500,
 }
+
+export enum EEffectTag {
+  passiveEffect = "passiveEffect",
+  layoutEffect = "layoutEffect",
+  imperativeHandle = "imperativeHandle",
+  syncExternalStore = "syncExternalStore",
+}
+
+export const FORWARD_REF = Symbol.for("forwardRef")
