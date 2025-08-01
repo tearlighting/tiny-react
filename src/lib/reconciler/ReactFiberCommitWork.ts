@@ -56,8 +56,6 @@ function mutation(fiber: Fiber) {
     commitUpdate(fiber)
   }
   if (fiber.flags & EFiberFlags.Deletion) {
-    console.log(fiber)
-
     commitDeletion(fiber)
   }
 }

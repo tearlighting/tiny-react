@@ -16,7 +16,11 @@
     "jsx": "react",
     "jsxFactory": "createElement",
     "jsxFragmentFactory": "Fragment",
-
+    "paths": {
+      "@/*": ["src/*"],
+      "#/*": ["demo/*"]
+    },
+    "baseUrl": "./",
     /* Linting */
     "strict": true,
     "noUnusedLocals": false,
@@ -25,5 +29,5 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src"]
+  "include": ["src", "demo"]
 }

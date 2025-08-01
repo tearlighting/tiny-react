@@ -72,6 +72,24 @@ export class Fiber {
   //  * 副作用收集（收集useLayoutEffect）
   //  */
   // layoutEffectList?: Effect[]
+  /**
+   * 存context在fiber上，通过子fiber递归向上找到最近的contextType，做key用
+   */
+  contextType: any = null
+  /**
+   * 这就是存的具体值
+   * 因为会出现一下覆盖的情况，不能相信contextType,而是相信fiber
+   * 
+   * ```tsx
+   * <MyContext.Provider value="A">
+       <Child1 />
+      <MyContext.Provider value="B">
+         <Child2 />
+      </MyContext.Provider>
+     </MyContext.Provider>
+   * ```
+   */
+  contextValue: any = null
   constructor({
     key = null,
     type,

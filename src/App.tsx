@@ -59,7 +59,9 @@ export default function App({ id }: { id: string }) {
   //   }, [buttonRef.current])
   return (
     <div>
-      <button onClick={onClick}>count</button>
+      <button onClick={onClick} className=" bg-blue-400">
+        count
+      </button>
       {/* <button onClick={() => setCount2(count2 + 1)}>count2: {count2}</button> */}
       {/* <MyInput ref={buttonRef} className="bg-red-400" /> */}
       <button>{state}</button>

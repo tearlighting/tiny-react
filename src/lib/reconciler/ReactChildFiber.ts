@@ -130,7 +130,10 @@ export function reconcilerChildren(returnFiber: Fiber, children: VNode | string 
           continue
         }
         const newFiber = createFiber(newChildrenVNode, returnFiber)
+        newFiber.index = i
+
         const key = newFiber.key ?? newFiber.index!.toString()
+
         if (map.has(key)) {
           const alternate = map.get(key)
           reuseAlternateFiber(newFiber, alternate!)

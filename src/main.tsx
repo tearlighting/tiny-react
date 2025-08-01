@@ -1,20 +1,22 @@
-import { createRoot, createElement } from "./lib/react-dom"
-import App from "./App"
-import { scheduleCallbackWithPriority } from "./lib/scheduler"
-import { EPriorityLevel } from "./lib/shared/constants"
+import "#/main"
+// import { createRoot, createElement } from "./lib/react-dom"
+// import App from "./App"
+// import "./index.css"
+// import { scheduleCallbackWithPriority } from "./lib/scheduler"
+// import { EPriorityLevel } from "./lib/shared/constants"
 
-createRoot(document.getElementById("root")!).render(
-  // <ul className="test" id="u">
-  //   "1"
-  //   <li>
-  //     <div>123</div>
-  //     456
-  //   </li>
-  //   "2"
-  // </ul>
-  <App id="123" />
-  // `123`
-)
+// createRoot(document.getElementById("root")!).render(
+//   // <ul className="test" id="u">
+//   //   "1"
+//   //   <li>
+//   //     <div>123</div>
+//   //     456
+//   //   </li>
+//   //   "2"
+//   // </ul>
+//   <App id="123" />
+//   // `123`
+// )
 // const root = createRoot(document.getElementById("root")!)
 // root.render(<App id="123" />)
 // setTimeout(() => {

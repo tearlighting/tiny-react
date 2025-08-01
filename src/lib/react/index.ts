@@ -8,6 +8,7 @@ export * from "./forwardRef"
 export * from "./useSyncExternalStore"
 export * from "./useMemo"
 export * from "./useCallback"
+export * from "./context"
 export abstract class Component<TProp extends Record<string, any>> {
   constructor(protected props: TProp) {}
   state: any

@@ -1,0 +1,27 @@
+@import "tailwindcss";
+@import "prismjs/themes/prism.css";
+@tailwind utilities;
+
+.layout-container {
+  @apply grid grid-cols-[15rem_1fr] grid-rows-[5rem_1fr] h-screen;
+  .nav-container {
+    @apply h-full overflow-hidden row-span-2 col-span-1 bg-purple-950;
+  }
+  .name-container {
+    @apply row-span-1 col-span-1 flex justify-center items-center border-gray-400 border-b-1 text-2xl font-bold shadow;
+  }
+  .content-container {
+    @apply h-full overflow-hidden row-span-1 col-span-1;
+  }
+}
+
+.page-contain {
+  @apply h-full grid grid-rows-[40%_60%] grid-cols-1;
+
+  .content {
+    @apply size-full row-span-1 flex justify-center items-center;
+  }
+  .footer {
+    @apply size-full row-span-1;
+  }
+}

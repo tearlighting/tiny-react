@@ -28,7 +28,7 @@ export const eventMiddleware: PatchMiddleware<PatchCtx> = (ctx, next) => {
 export const classMiddleware: PatchMiddleware<PatchCtx> = (ctx, next) => {
   const { key, preVal, nextVal, node } = ctx
   if (key !== EPatchType.class) return next()
-  if (preVal[key] !== nextVal[key]) {
+  if (nextVal[key] && preVal[key] !== nextVal[key]) {
     patchClass(node, preVal[key], nextVal[key])
   }
 }

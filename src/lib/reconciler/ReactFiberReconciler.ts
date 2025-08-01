@@ -32,6 +32,7 @@ export function reconcilerFunctionComponentChildren(wip: Fiber | null) {
   if (wip && isFunction(wip.type)) {
     //先处理hooks
     renderWithHooks(wip)
+    // console.log(wip)
 
     const children = wip.tag === EFiberTags.ForwardRef ? wip.type(wip.props, wip.ref) : wip.type(wip.props)
     // console.log(children)
@@ -87,6 +88,8 @@ export function commitUpdate(fiber: Fiber) {
       const dom = wip.stateNode as HTMLElement
       const updates = wip.updateQueue as TextUpdateQueue
       //   console.log(wip, wip.alternate?.props?.children)
+      console.log(wip)
+
       dom.nodeValue = updates
     },
   }
