@@ -12,11 +12,11 @@ interface RouterProps {
 export function Router({ routes }: RouterProps) {
   const [path, setPath] = useState(window.location.pathname)
 
-  useEffect(() => {
-    const handler = () => setPath(window.location.pathname)
-    window.addEventListener("popstate", handler)
-    return () => window.removeEventListener("popstate", handler)
-  }, [])
+  // useEffect(() => {
+  //   const handler = () => setPath(window.location.pathname)
+  //   window.addEventListener("popstate", handler)
+  //   return () => window.removeEventListener("popstate", handler)
+  // }, [])
 
   const route = routes.find((r) => r.path === path)
   return route ? route.element : <div>404 Not Found</div>

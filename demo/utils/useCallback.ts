@@ -1,6 +1,8 @@
-import { areHookInputsEqual } from "../shared/utils"
-import { updateWorkInProgressHook } from "./ReactHooks"
-
+const useCallbackStr = `
+interface Callback<T extends (...args: any[]) => any> {
+    deps?: any[]
+    callback: T
+}
 export function useCallback<T extends (...args: any[]) => any>(callback: T, deps: any[]) {
   const hook = updateWorkInProgressHook()
   const prev = hook.memorizedState as Callback<T>
@@ -12,5 +14,12 @@ export function useCallback<T extends (...args: any[]) => any>(callback: T, deps
     }
     hook.memorizedState = res
   }
-  return hook.memorizedState.callback as T
+  return hook.memorizedState.callback
+}
+`
+
+export function getUseCallbackData() {
+  return {
+    useCallbackStr,
+  }
 }

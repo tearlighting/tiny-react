@@ -76,13 +76,14 @@ function performUnitOfWork() {
 function commitRoot() {
   if (!wipRoot || !wipRoot.pendingChildren) return
   commitWork(wipRoot.pendingChildren)
+  //excharge alternate
+  wipRoot.current = wipRoot.pendingChildren
+  wipRoot.pendingChildren = createWorkInProgress(wipRoot.current)
+  wipRoot.pendingChildren.return = wipRoot as any
   /**
    * commit阶段，执行副作用,只是我里面是递归，我只好提出来了
    */
   flushEffects(wipRoot.updateQueue, [EEffectTag.layoutEffect, EEffectTag.imperativeHandle, EEffectTag.syncExternalStore])
-  wipRoot.current = wipRoot.pendingChildren
-  wipRoot.pendingChildren = createWorkInProgress(wipRoot.current)
-  wipRoot.pendingChildren.return = wipRoot as any
   const rootEffects = wipRoot.updateQueue as Effect | null
   setTimeout(() => {
     flushEffects(rootEffects, [EEffectTag.passiveEffect])

@@ -22,7 +22,7 @@ export function forwardRef<T, P = {}>(render: (props: P, ref: { current: T } | n
  * @param create
  * @param deps
  */
-export function useImperativeHandle<T>(ref: { current: T | null } | undefined, create: () => T, deps?: any[]) {
+export function useImperativeHandle<T>(ref: { current: T | null } | undefined | null, create: () => T, deps?: any[]) {
   const hook = updateWorkInProgressHook()
   const prev = hook.memorizedState as { deps?: any[] } | undefined
   let changed = !(deps && prev?.deps && areHookInputsEqual(deps, prev.deps))

@@ -16,7 +16,7 @@ declare global {
      */
     next?: Hook | null
     /**
-     * 这是useState,useRef的update更新队列。useEffect这种副作用队列不挂在这里，挂在外部的fiber。
+     * 这是useState的update更新队列。useEffect这种副作用队列不挂在这里，挂在外部的fiber。
      */
     updateQueue: {
       /**

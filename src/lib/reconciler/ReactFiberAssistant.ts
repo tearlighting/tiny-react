@@ -35,7 +35,7 @@ export function placeChild(newFiber: Fiber, lastPlacedIndex: number, newIndex: n
   const current = newFiber.alternate
   if (current) {
     const oldIndex = current.index!
-    //你想差到之前的位置，说明位置乱了，需要移动
+    //你想插到之前的位置，说明位置乱了，需要移动
     if (oldIndex < lastPlacedIndex) {
       //能复用但乱了
       newFiber.flags |= EFiberFlags.Placement
