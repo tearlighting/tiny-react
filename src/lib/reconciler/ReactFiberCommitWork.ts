@@ -1,10 +1,14 @@
 import { EEffectTag, EFiberFlags, EFiberTags } from "../shared/constants"
 import { patchRef } from "../shared/uploadNodeMiddleWares"
 import { flushEffects, getFiberRoot } from "../shared/utils"
-import type { Fiber } from "./ReactFiber"
+import type { Fiber, FiberRoot } from "./ReactFiber"
 import { appendAllChildren } from "./ReactFiberCompleteWork"
 import { commitDeletion, commitPlacement, commitUpdate } from "./ReactFiberReconciler"
-
+let count = 0
+function swichRoute() {
+  count++
+  console.log(count)
+}
 /**
  * mount阶段直接挂到根节点
  * update一层一层递归
@@ -15,6 +19,8 @@ export function commitWork(fiber: Fiber | null) {
   if (!fiber) return
   //初次渲染Mount,直接加入root
   if (!fiber.alternate) {
+    const fromRouter = fiber.return?.return! as unknown as FiberRoot
+
     appendAllChildren(fiber.return!.stateNode!, fiber.child)
     const wipRoot = getFiberRoot(fiber)
     commitAttachRef(wipRoot.pendingChildren)
@@ -27,6 +33,7 @@ export function commitWork(fiber: Fiber | null) {
       layout(fiber)
       commitWork(fiber.child)
     }
+
     commitWork(fiber.sibling)
   }
 }

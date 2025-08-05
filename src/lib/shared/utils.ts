@@ -135,7 +135,7 @@ export function updateNode(node: HTMLElement, preVal: NonNullable<Fiber["props"]
 export function getHostParentFiber(fiber: Fiber): Fiber | null {
   let parent = fiber.return
   while (parent) {
-    if (parent.tag === EFiberTags.HostComponent || parent.tag === EFiberTags.HostRoot) {
+    if (parent.tag === EFiberTags.HostComponent || parent.tag === EFiberTags.HostText) {
       return parent
     }
     parent = parent.return

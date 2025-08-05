@@ -52,6 +52,8 @@ export function placeChild(newFiber: Fiber, lastPlacedIndex: number, newIndex: n
 }
 
 export function deleteRemainingChildren(returnFiber: Fiber, currentFirstChild: Fiber | null) {
+  //   console.log(currentFirstChild, "delete")
+
   let childToDelete = currentFirstChild
   while (childToDelete) {
     deleteChild(returnFiber, childToDelete)

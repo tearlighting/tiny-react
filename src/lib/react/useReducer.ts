@@ -13,6 +13,8 @@ export function useReducer<T extends any>(reducer: ((state: T) => T) | null, ini
     hook.updateQueue = { pending: null }
   }
   const dispatch = (action: T | ((pre: T) => T)) => {
+    console.log("dispatch", action)
+
     dispatchReducerAction(currentlyRenderingFiber!, hook, reducer, action)
   }
   return [hook.memorizedState, dispatch] as [T, (action: T | ((pre: T) => T)) => void]

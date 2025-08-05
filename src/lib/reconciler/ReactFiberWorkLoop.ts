@@ -17,7 +17,7 @@ let wip: Fiber | null = null
 let wipRoot: FiberRoot | null = null
 export function scheduleUpdateOnFiber(fiber: Fiber | FiberRoot) {
   wipRoot = getFiberRoot(fiber)
-  console.log("scheduleUpdateOnFiber", wipRoot)
+  console.log("scheduleUpdateOnFiber", wipRoot, fiber)
 
   wip = wipRoot.pendingChildren
   //空闲时间执行workLoop，之后替换为Scheduler
@@ -87,8 +87,11 @@ function commitRoot() {
   setTimeout(() => {
     flushEffects(rootEffects, [EEffectTag.passiveEffect])
   })
+  console.log(wipRoot.current)
+
   wipRoot!.updateQueue = null
   wip = null
+
   //   throw new Error("Function not implemented.")
 }
 

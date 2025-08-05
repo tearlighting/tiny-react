@@ -130,6 +130,7 @@ function updateHostComponent(current: Fiber, wip: Fiber) {
 
   //diffProps
   const updatePayload = diffProps(oldProps, newProps)
+
   if (updatePayload) {
     wip.updateQueue = updatePayload
     wip.flags |= EFiberFlags.Update

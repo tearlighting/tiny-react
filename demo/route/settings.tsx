@@ -1,5 +1,5 @@
 import { DefaultLayout } from "#/layout/DefaultLayout"
-import { Flow } from "#/pages"
+import { Flow, Scheduler } from "#/pages"
 import { createElement } from "@/lib/react-dom"
 
 export interface IPageItem {
@@ -24,6 +24,15 @@ export const pages: Array<IPageItem> = [
     element: (
       <DefaultLayout>
         <Flow />
+      </DefaultLayout>
+    ),
+  },
+  {
+    path: "/scheduler",
+    name: "scheduler",
+    element: (
+      <DefaultLayout>
+        <Scheduler></Scheduler>
       </DefaultLayout>
     ),
   },

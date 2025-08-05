@@ -5,9 +5,8 @@ import { Menu } from "#/component/Menu"
 export default function App() {
   //   return <BrowserRouter>{Routes}</BrowserRouter>
   return (
-    // <RouterProvider>
-    //   <Router routes={pages} />
-    // </RouterProvider>
-    <Menu />
+    <RouterProvider>
+      <Router routes={pages} />
+    </RouterProvider>
   )
 }
