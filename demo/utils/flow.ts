@@ -12,7 +12,7 @@ function scheduleUpdateOnFiber(fiber: Fiber | FiberRoot) {
 function workLoop(remainingTime: number) {
   while (wip) {
     if (remainingTime < 0) return workLoop
-    //执行workLoop
+    //call workLoop
     performUnitOfWork()
   }
   if (!wip) {

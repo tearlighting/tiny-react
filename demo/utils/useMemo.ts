@@ -17,8 +17,25 @@ export function useMemo<T>(factory: () => T, deps: any[]): T {
   return hook.memorizedState.value
 }
 `
+
+const example = `const { createPopup, clear } = useCreatePopup()
+const [count, setCount] = useState(0)
+const handler1 = () => setCount((x) => x + 1)
+const handler2 = useMemo(() => () => setCount((x) => x + 1), [])
+useEffect(() => {
+  rootRef.current?.appendChild(createPopup("useEffect", "value changed", false))
+}, [handler1])
+useLayoutEffect(() => {
+  rootRef.current?.appendChild(createPopup("useEffect", "useMemo changed", false))
+}, [handler2])
+
+//vnode
+        <MyButton onClick={() => setCount(count + 1)}> count:{count}</MyButton>
+<MyButton onClick={clear} type="success" className="ml-5">clear</MyButton>
+`
 export const getUseMemoData = () => {
   return {
     useMemoStr,
+    example,
   }
 }

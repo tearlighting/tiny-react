@@ -1,5 +1,4 @@
-const contextStr = `
-export function createContext<T>(defaultValue: T) {
+const contextStr = `export function createContext<T>(defaultValue: T) {
   const res = {
     _currentValue: defaultValue,
     Provider: null as unknown as ReturnType<typeof createProvider<T>>,
@@ -12,8 +11,8 @@ export function createContext<T>(defaultValue: T) {
 function createProvider<T>(context: any) {
   function Provider({ value, children }: { value: T; children?: ReactNode }) {
     const fiber = currentlyRenderingFiber!
-    fiber.contextValue = value // 挂到当前 Fiber
-    fiber.contextType = context // 标记是哪一个 context
+    fiber.contextValue = value // value
+    fiber.contextType = context // key
     return children
   }
   context.Provider = Provider
@@ -32,13 +31,8 @@ export function useContext<T>(context: { _currentValue: T }): T | null {
   return null
 }
 `
-const example = `
-const context = createContext<{ className: string }>({
-  className: "bg-blue-400",
-})
-
+const example = `const context = createContext<{ className: string }>({})
 export const StyleProvider = context.Provider
-
 export const useStyle = () => {
   const item = useContext(context)
   if (!item) {
@@ -46,7 +40,6 @@ export const useStyle = () => {
   }
   return item!
 }
-
 //usage
 export function Context() {
   return (
@@ -59,7 +52,6 @@ export function Context() {
     </div>
   )
 }
-
 function Parent({ children }: { children?: ReactNode }) {
   const { className } = useStyle()
   return (
@@ -69,12 +61,10 @@ function Parent({ children }: { children?: ReactNode }) {
     </div>
   )
 }
-
 function Child() {
   const { className } = useStyle()
   return <div className={clsx(className, "w-20 h-20 flex items-center justify-center")}>child</div>
 }
-
 `
 
 export const getContextData = () => {

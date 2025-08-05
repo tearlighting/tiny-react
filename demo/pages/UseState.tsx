@@ -1,3 +1,6 @@
+import { MyButton } from "#/component/MyButton"
+import { MyCode } from "#/component/MyCode"
+import { useSetCodeStyle } from "#/hooks/useSetCodeStyle"
 import { getUseStateData } from "#/utils/useState"
 import { useState } from "@/lib/react"
 import { createElement } from "@/lib/react-dom"
@@ -5,20 +8,19 @@ import { createElement } from "@/lib/react-dom"
 const { example, useStateStr } = getUseStateData()
 export function UseState() {
   const [count, setCount] = useState(0)
+  useSetCodeStyle()
   return (
-    <div>
-      <div>
-        <p>example</p>
-        <pre>
-          <code>{example}</code>
-        </pre>
-        <button onClick={() => setCount(count + 1)} className="hover:cursor-pointer shadow-2xl py-1 px-2 bg-blue-400 rounded-xs text-white">
-          count:{count}
-        </button>
+    <div className="h-full w-full overflow-y-auto">
+      <p className="text-xl font-bold pl-5 py-5">example: count</p>
+      <p className="pl-8 pb-3">code</p>
+      <MyCode>{example}</MyCode>
+      <div className="flex justify-center items-center gap-5 mt-5">
+        <label> click me:</label>
+        <MyButton onClick={() => setCount(count + 1)}>count:{count}</MyButton>
       </div>
-      <pre>
-        <code>{useStateStr}</code>
-      </pre>
+
+      <p className="text-xl font-bold pl-5 py-5">Overview</p>
+      <MyCode>{useStateStr}</MyCode>
     </div>
   )
 }

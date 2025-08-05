@@ -11,11 +11,13 @@ export function useRef<T>(initialValue: T | (() => T)): { current: T } {
   return hook.memorizedState
 }
 `
-export const example = `
-const inputRef = useRef<HTMLInputElement | null>(null)
+export const example = `const inputRef = useRef<HTMLInputElement | null>(null)
 useEffect(() => {
     inputRef.current?.focus()
 }, [])
+
+//vnode
+<input ref={inputRef}/>
 `
 
 export const getUseRefData = () => {

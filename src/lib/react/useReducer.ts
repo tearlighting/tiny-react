@@ -10,14 +10,14 @@ export function useReducer<T extends any>(reducer: ((state: T) => T) | null, ini
   //mount的时候需要手动挂，update的时候就自己带出来了
   if (!currentlyRenderingFiber?.alternate) {
     hook.memorizedState = initialState instanceof Function ? initialState() : initialState
-    hook.updateQueue = { pending: null }
-  }
-  const dispatch = (action: T | ((pre: T) => T)) => {
-    console.log("dispatch", action)
 
-    dispatchReducerAction(currentlyRenderingFiber!, hook, reducer, action)
+    const dispatch = (action: T | ((pre: T) => T)) => {
+      dispatchReducerAction(currentlyRenderingFiber!, hook, reducer, action)
+    }
+    hook.updateQueue = { pending: null, dispatch }
   }
-  return [hook.memorizedState, dispatch] as [T, (action: T | ((pre: T) => T)) => void]
+
+  return [hook.memorizedState, hook.updateQueue.dispatch] as [T, (action: T | ((pre: T) => T)) => void]
 }
 
 /**

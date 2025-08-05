@@ -1,3 +1,6 @@
+import { MyButton } from "#/component/MyButton"
+import { MyCode } from "#/component/MyCode"
+import { useSetCodeStyle } from "#/hooks/useSetCodeStyle"
 import { getUseSyncExternalStoreData } from "#/utils/useSyncExternalStore"
 import { useCallback, useRef, useSyncExternalStore } from "@/lib/react"
 import { createElement } from "@/lib/react-dom"
@@ -37,23 +40,19 @@ const { example, useSyncExternalStoreStr } = getUseSyncExternalStoreData()
 export function UseSyncExternalStore() {
   const { addCount, subscribe, getSnapshot } = useAddCount()
   const count = useSyncExternalStore((onStoreChange) => subscribe("addCount", onStoreChange), getSnapshot)
+  useSetCodeStyle()
   return (
-    <div>
-      <div>
-        <p>example</p>
-        <pre>
-          <code>{example}</code>
-        </pre>
+    <div className="h-full w-full overflow-y-auto">
+      <p className="text-xl font-bold pl-5 py-5">example: count by publish </p>
+      <p className="pl-8 pb-3">code</p>
+      <MyCode>{example}</MyCode>
+      <div className="text-center ">
+        <label className="mr-3">click me:</label>
+        <MyButton onClick={addCount}>count:{count}</MyButton>
       </div>
 
-      <button onClick={() => addCount()} className="hover:cursor-pointer shadow-2xl py-1 px-2 bg-blue-400 rounded-xs text-white">
-        count:{count}
-      </button>
-      <div>
-        <pre>
-          <code>{useSyncExternalStoreStr}</code>
-        </pre>
-      </div>
+      <p className="text-xl font-bold pl-5 py-5">Overview</p>
+      <MyCode>{useSyncExternalStoreStr}</MyCode>
     </div>
   )
 }

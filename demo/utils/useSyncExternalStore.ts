@@ -1,10 +1,8 @@
-const useSyncExternalStoreStr = `
-export function useSyncExternalStore<T>(subscribe: (onStoreChange: () => void) => () => void, getSnapshot: () => T): T {
+const useSyncExternalStoreStr = `export function useSyncExternalStore<T>(subscribe: (onStoreChange: () => void) => () => void, getSnapshot: () => T): T {
   const hook = updateWorkInProgressHook()
   const fiber = currentlyRenderingFiber!
   const snapshot = getSnapshot()
-  if (!currentlyRenderingFiber?.alternate) {
-    // mount
+  if (!currentlyRenderingFiber?.alternate) { // mount
     hook.memorizedState = snapshot
     let unsubscribe: (() => void) | null = null
     const onStoreChange = () => {
@@ -29,8 +27,7 @@ export function useSyncExternalStore<T>(subscribe: (onStoreChange: () => void) =
 }
 `
 
-const example = `
-const usePubSub = () => {
+const example = `const usePubSub = () => {
   let eventList = useRef(() => new Map<string, (...args: any) => any>())
   const publish = useCallback((event: string, ...args: any[]) => {
     if (eventList.current.has(event)) {
@@ -38,10 +35,8 @@ const usePubSub = () => {
     }
   }, [])
   const subscribe = useCallback((event: string, fn: (...args: any[]) => any) => {
-    console.log("subscribe")
     eventList.current.set(event, fn)
     return () => {
-      console.log("unsubscribe")
       eventList.current.delete(event)
     }
   }, [])
@@ -52,12 +47,15 @@ const useAddCount = () => {
   const countRef = useRef(0)
   const { publish, subscribe } = usePubSub()
   const addCount = useCallback(() => {
-    countRef.current++
-    publish("addCount", countRef.current)
+    publish("addCount", ++countRef.current)
   }, [])
   const getSnapshot = () => countRef.current
   return { addCount, subscribe, getSnapshot }
-}`
+}
+
+//vnode
+<MyButton onClick={addCount}> count:{count}</MyButton>  
+`
 
 export const getUseSyncExternalStoreData = () => {
   return {

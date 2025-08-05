@@ -1,15 +1,15 @@
-const useReducer = `
-function useReducer<T extends any>(reducer: ((state: T) => T) | null, initialState: T | (() => T)) {
+const useReducer = `function useReducer<T extends any>(reducer: ((state: T) => T) | null, initialState: T | (() => T)) {
   const hook = updateWorkInProgressHook()
   //mount
-  if (!currentlyRenderingFiber?.alternate) {
-    hook.memorizedState = initialState instanceof Function ? initialState() : initialState
-    hook.updateQueue = { pending: null }
-  }
-  const dispatch = (action: T | ((pre: T) => T)) => {
-    dispatchReducerAction(currentlyRenderingFiber!, hook, reducer, action)
-  }
-  return [hook.memorizedState, dispatch] as [T, (action: T | ((pre: T) => T)) => void]
+   if (!currentlyRenderingFiber?.alternate) {
+     hook.memorizedState = initialState instanceof Function ? initialState() : initialState
+ 
+     const dispatch = (action: T | ((pre: T) => T)) => {
+       dispatchReducerAction(currentlyRenderingFiber!, hook, reducer, action)
+     }
+     hook.updateQueue = { pending: null, dispatch }
+   }
+  return [hook.memorizedState,hook.updateQueue.dispatch] as [T, (action: T | ((pre: T) => T)) => void]
 }
 
 interface Update<T> {
@@ -40,8 +40,10 @@ function dispatchReducerAction<T extends any>(fiber: Fiber, hook: Hook, reducer:
   scheduleUpdateOnFiber(wip)
 }
 `
-const example = `
-const [count, setCount] = useReducer((x) => x + 1, 1)
+const example = `const [count, setCount] = useReducer((x) => x + 1, 1)
+
+//vnode
+<MyButton onClick={() => setCount(count)}>count:{count}</MyButton>
 `
 
 export const getUseReducerData = () => {

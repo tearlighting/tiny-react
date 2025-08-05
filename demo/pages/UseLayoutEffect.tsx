@@ -1,10 +1,15 @@
+import { MyButton } from "#/component/MyButton"
+import { MyCode } from "#/component/MyCode"
+import { useCreatePopup } from "#/hooks/useCreatePopup"
+import { useSetCodeStyle } from "#/hooks/useSetCodeStyle"
 import { getUseLayoutEffect } from "#/utils/useLayoutEffect"
-import { useRef, useState, useCallback, useEffect, useLayoutEffect } from "@/lib/react"
+import { useRef, useState, useEffect, useLayoutEffect } from "@/lib/react"
 import { createElement } from "@/lib/react-dom"
+
 const { example, useLayoutEffectStr } = getUseLayoutEffect()
 export function UseLayoutEffect() {
   const root = useRef<HTMLElement | null>(null)
-  useEffect(() => {
+  useLayoutEffect(() => {
     const rootDom = document.getElementById("root")
     root.current = rootDom
   }, [])
@@ -18,50 +23,21 @@ export function UseLayoutEffect() {
     const popup = createPopup("useLayoutEffect", `count:${count}`)
     root.current?.appendChild(popup)
   }, [count])
+  useSetCodeStyle()
   return (
-    <div>
-      <div>
-        <p>example</p>
-        <pre>
-          <code>{example}</code>
-        </pre>
-        <button onClick={() => setCount(count + 1)} className="hover:cursor-pointer  shadow-2xl py-1 px-2 bg-blue-400 rounded-xs text-white">
-          count:{count}
-        </button>
-        <button onClick={() => clear()} className="hover:cursor-pointer ml-10  shadow-2xl py-1 px-2 bg-blue-400 rounded-xs text-white">
+    <div className="h-full w-full overflow-y-auto">
+      <p className="text-xl font-bold pl-5 py-5">example: popup effect list and layout effect list</p>
+      <p className="pl-8 pb-3">code</p>
+      <MyCode>{example}</MyCode>
+      <div className="flex justify-center items-center gap-5 mt-5">
+        <label> click me:</label>
+        <MyButton onClick={() => setCount(count + 1)}> count:{count}</MyButton>
+        <MyButton onClick={clear} type="success">
           clear
-        </button>
+        </MyButton>
       </div>
-      <pre>
-        <code>{useLayoutEffectStr}</code>
-      </pre>
+      <p className="text-xl font-bold pl-5 py-5">Overview</p>
+      <MyCode>{useLayoutEffectStr}</MyCode>
     </div>
   )
-}
-
-function useCreatePopup() {
-  const popDoms = useRef<Set<HTMLElement>>(new Set())
-  const createPopup = useCallback((type: "useEffect" | "useLayoutEffect", content: string | number) => {
-    const popup = document.createElement("div")
-    try {
-      popup.style.position = "fixed"
-      popup.style.transform = `translateY(${popDoms.current.size * 30}px)`
-      popup.className = "h-[30px] w-[200px] top-0 mt-5 right-0 bg-blue-400 rounded text-white text-center transition-all duration-100"
-      popup.innerText = `${type}:${content}`
-      return popup
-    } finally {
-      popDoms.current.add(popup)
-    }
-  }, [])
-  const clear = useCallback(() => {
-    popDoms.current.forEach((dom) => {
-      dom.remove()
-    })
-    popDoms.current.clear()
-    console.log(popDoms)
-  }, [])
-  return {
-    createPopup,
-    clear,
-  }
 }

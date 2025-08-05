@@ -1,8 +1,10 @@
+import { getPathName } from "#/utils"
 import { useState, useEffect } from "@/lib/react"
 import { createElement } from "@/lib/react-dom"
 export interface RouteConfig {
   path: string
   element: JSX.Element
+  name: string
 }
 
 interface RouterProps {
@@ -10,7 +12,7 @@ interface RouterProps {
 }
 
 export function Router({ routes }: RouterProps) {
-  const [path, setPath] = useState(window.location.pathname)
+  const [path] = useState(getPathName)
 
   // useEffect(() => {
   //   const handler = () => setPath(window.location.pathname)
@@ -18,7 +20,8 @@ export function Router({ routes }: RouterProps) {
   //   return () => window.removeEventListener("popstate", handler)
   // }, [])
 
-  const route = routes.find((r) => r.path === path)
+  const route = routes.find((r) => r.name.toLocaleLowerCase() === path.toLocaleLowerCase())
+
   return route ? route.element : <div>404 Not Found</div>
 }
 

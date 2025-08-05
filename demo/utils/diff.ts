@@ -27,13 +27,11 @@ export function reconcilerChildren(returnFiber: Fiber, children: VNode | string 
    */
   let lastPlacedIndex = 0
   /**
-   * 是否需要追踪副作用
-   * false是初次渲染
-   * true是更新
+   *is mount or update
    */
   let shouldTrackSideEffects = !!returnFiber.alternate
   /**
-   * 缓存下一个旧节点
+   * the fiber was handled next time.it use to create linked list.
    */
   let nextOldFiber = null
   /**

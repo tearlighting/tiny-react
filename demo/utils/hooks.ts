@@ -1,4 +1,27 @@
 const hooks = `
+interface Hook<T = any> {
+    /**
+     * The memorized state of the hook
+     */
+    memorizedState?: Effect | State | Ref | Memo | Callback
+    /**
+     * The queue of updates for the hook
+     */
+    queue?: Update<T> | null
+    /**
+    /**
+     * The next hook in the chain
+     */
+    next?: Hook | null
+    /**
+     * update for useState
+     */
+    updateQueue: {
+      /**
+       *circular linked list to update useState
+       */
+      pending: Update<T> | null
+}
 
 /**
  * FunctionComponent fiber is rendering
@@ -66,32 +89,6 @@ function processUpdateQueue<T>(hook: Hook<T>) {
 
 `
 
-const hookType = `
-interface Hook<T = any> {
-    /**
-     * The memorized state of the hook
-     */
-    memorizedState?: Effect | State | Ref | Memo | Callback
-    /**
-     * The queue of updates for the hook
-     */
-    queue?: Update<T> | null
-    /**
-    /**
-     * The next hook in the chain
-     */
-    next?: Hook | null
-    /**
-     * update for useState
-     */
-    updateQueue: {
-      /**
-       *circular linked list to update useState
-       */
-      pending: Update<T> | null
-}
-`
-
 export const getHooksData = () => {
-  return { hooks, hookType }
+  return { hooks }
 }

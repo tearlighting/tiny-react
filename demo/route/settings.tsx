@@ -2,10 +2,13 @@ import { DefaultLayout } from "#/layout/DefaultLayout"
 import { createElement } from "@/lib/react-dom"
 import {
   Flow,
+  Scheduler,
+  Reconciler,
   BeginWork,
   Diff,
   CompleteWork,
   CommitWork,
+  Hooks,
   UseReducer,
   UseState,
   UseEffect,
@@ -43,6 +46,24 @@ export const pages: Array<IPageItem> = [
     ),
   },
   {
+    path: "/scheduler",
+    name: "scheduler",
+    element: (
+      <DefaultLayout>
+        <Scheduler />
+      </DefaultLayout>
+    ),
+  },
+  {
+    path: "/reconciler",
+    name: "reconciler",
+    element: (
+      <DefaultLayout>
+        <Reconciler />
+      </DefaultLayout>
+    ),
+  },
+  {
     path: "/beginWork",
     name: "beginWork",
     element: (
@@ -75,6 +96,15 @@ export const pages: Array<IPageItem> = [
     element: (
       <DefaultLayout>
         <CommitWork />
+      </DefaultLayout>
+    ),
+  },
+  {
+    path: "/hooks",
+    name: "hooks",
+    element: (
+      <DefaultLayout>
+        <Hooks />
       </DefaultLayout>
     ),
   },
@@ -142,7 +172,7 @@ export const pages: Array<IPageItem> = [
     ),
   },
   {
-    path: "/forwardRefAndUseImpretiveHandle",
+    path: "/useImpretiveHandle",
     name: "useImpretiveHandle",
     element: (
       <DefaultLayout>

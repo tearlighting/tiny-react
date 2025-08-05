@@ -23,6 +23,10 @@ declare global {
        * 约定pending指向环形链表的最后一个节点，next指向第一个
        */
       pending: Update<T> | null
+      /**
+       * 挂在hook上就不会每次生成新函数了
+       */
+      dispatch?: (action: T | ((pre: T) => T)) => void
     }
   }
 

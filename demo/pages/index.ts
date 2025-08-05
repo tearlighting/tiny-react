@@ -1,4 +1,6 @@
 export * from "./Flow"
+export * from "./Scheduler"
+export * from "./Reconciler"
 export * from "./BeginWork"
 export * from "./Diff"
 export * from "./CompleteWork"

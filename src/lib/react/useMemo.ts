@@ -12,5 +12,5 @@ export function useMemo<T>(factory: () => T, deps: any[]): T {
     }
     hook.memorizedState = memo
   }
-  return hook.memorizedState.value
+  return hook.memorizedState.value as T
 }

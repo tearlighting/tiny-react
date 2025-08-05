@@ -99,6 +99,7 @@ function patchClass(el: HTMLElement, prev: string, next: string) {
   }
 }
 export function patchRef(ref: Function | { current: any }, dom: HTMLElement | null) {
+  console.log(ref)
   if (!ref) return
   if (typeof ref === "function") {
     ref(dom)

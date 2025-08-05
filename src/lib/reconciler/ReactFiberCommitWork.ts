@@ -19,7 +19,7 @@ export function commitWork(fiber: Fiber | null) {
   if (!fiber) return
   //初次渲染Mount,直接加入root
   if (!fiber.alternate) {
-    const fromRouter = fiber.return?.return! as unknown as FiberRoot
+    console.log(fiber)
 
     appendAllChildren(fiber.return!.stateNode!, fiber.child)
     const wipRoot = getFiberRoot(fiber)
