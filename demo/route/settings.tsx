@@ -143,7 +143,7 @@ export const pages: Array<IPageItem> = [
   },
   {
     path: "/forwardRefAndUseImpretiveHandle",
-    name: "forwardRef And useImpretiveHandle",
+    name: "useImpretiveHandle",
     element: (
       <DefaultLayout>
         <ForwardRefAndUseImpretiveHandle />

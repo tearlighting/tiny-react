@@ -8,16 +8,15 @@
 
 - 🧠 **Fiber Architecture** – Basic implementation of React's concurrent rendering mechanism
 - 🔁 **Reconciler & Commit Phase** – Separate update & effect phases with DOM diffing
-- ⚙️ **Hooks System** – Supports `useState`, `useEffect`, `useRef`, `useReducer`
-- 🎯 **Task Scheduler** – Cooperative scheduling via `requestIdleCallback`
-- 🌐 **Single-page Demo Routing** – Different demos selected via URL query parameter
-- 📦 **Built with Vite** – Fast bundling and hot reload
+- ⚙️ **Hooks System** – Supports `useState`, `useEffect`, `useRef`, `useReducer` and more
+- 🎯 **Task Scheduler** – Cooperative scheduling via min heap
+- 🌐 **Single-page Demo Routing** – Different demos selected via URL
 
 ---
 
 ## Usage
 
-```
+```bash
 pnpm install
 pnpm dev
 pnpm build
@@ -52,7 +51,7 @@ Before this, I had already implemented a simplified version of Vue's reactivity 
 
 At least now when I look at Vue, it doesn’t feel like a black box anymore. I understand how proxy is used everywhere, and no longer need to think about Object.defineProperty recursively in created like in Vue 2. Modern browsers support ES6 modules well, and modern build tools compile only what’s needed. Vue 3 + Vite feels refreshingly fast — a big leap from the sluggish Webpack days.
 
-Of course, understanding all this wasn’t easy. I still remember a few years ago, I didn’t even know what npm run serve meant. Now I know how Webpack works deeply — from entry → loader → bundle → output, with plugins interweaving through the entire process. But frontend is not just Vue — there’s also another giant mountain: React.
+Of course, understanding all this wasn’t easy. I still remember a few years ago, I didn’t even know what `npm run serve` meant. Now I know how Webpack works deeply — from entry → loader → bundle → output, with plugins interweaving through the entire process. But frontend is not just Vue — there’s also another giant mountain: React.
 
 This time, I pushed myself from vague ideas all the way to real understanding. I hit many roadblocks — especially debugging fiber, which is notoriously hard, and the linked list structure that deeply nests UI trees.
 
@@ -72,7 +71,7 @@ At some point, I genuinely felt like something "clicked".
 
 Several things surprised me:
 
-Hooks — the way it uses a linked list stored on memorizedState is genius. Each hook retrieves its value via updateWorkInProgressHook, and the structure tracks them by order — not by name.
+Hooks — the way it uses a linked list stored on memorizedState is genius. Each hook retrieves its value via `updateWorkInProgressHook`, and the structure tracks them by order — not by name.
 
 Hooks + Fiber ring buffer — the circular structure of hooks and fiber links was something I’ve never seen before. Eye-opening.
 

@@ -1,4 +1,4 @@
-import type { IPageItem } from "#/route/settings"
+import { type IPageItem } from "#/route/settings"
 import { createElement } from "@/lib/react-dom"
 import clsx from "clsx"
 interface IMenuItem {
@@ -7,15 +7,17 @@ interface IMenuItem {
   className?: string
 }
 export function MenuItem({ item, isActive, className = "" }: IMenuItem) {
-  console.log(item)
-
+  // const clickHandle = useCallback(() => {
+  //   if (isActive) return
+  //   navigate(item.path)
+  // }, [isActive])
   return (
     <a
       className={clsx(
-        `flex items-center justify-center  py-4
+        `flex items-center justify-center  py-[5px]
     hover:text-gray-100
 	text-gray-50
-	m-1
+	  m-1
     transition-all duration-200 
 	`,
         className,

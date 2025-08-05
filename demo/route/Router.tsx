@@ -23,7 +23,7 @@ export function Router({ routes }: RouterProps) {
 }
 
 // 路由跳转 API
-export function navigate(to: string) {
-  window.history.pushState(null, "", to)
-  window.dispatchEvent(new PopStateEvent("popstate"))
-}
+// export function navigate(to: string) {
+//   window.history.pushState(null, "", to)
+//   window.dispatchEvent(new PopStateEvent("popstate"))
+// }

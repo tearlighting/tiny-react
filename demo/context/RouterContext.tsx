@@ -1,17 +1,16 @@
-import { useCurrentRoute } from "#/hooks/useCurrentRoute"
 import { type IPageItem, pages } from "#/route/settings"
 import { createContext, useContext, useEffect, useState } from "@/lib/react"
 import { createElement } from "@/lib/react-dom"
 const context = createContext<IPageItem>({} as IPageItem)
 
 export const RouterProvider = ({ children }: { children?: React.ReactNode }) => {
-  const { currentRoute } = useCurrentRoute()
+  const currentRoute = window.location.pathname
   const [currentItem, setCurrentItem] = useState(() => pages.find((x) => x.path === currentRoute)!)
 
   useEffect(() => {
-    setCurrentItem(() => pages.find((x) => x.path === currentRoute) || ({} as any))
+    const path = currentRoute === "/" ? "/flow" : currentRoute
+    setCurrentItem(() => pages.find((x) => x.path === path) || ({} as any))
   }, [currentRoute])
-  //@ts-ignore
   return <context.Provider value={currentItem}>{children}</context.Provider>
 }
 

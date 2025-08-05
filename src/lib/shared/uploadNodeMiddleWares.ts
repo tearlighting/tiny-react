@@ -22,7 +22,7 @@ export const eventMiddleware: PatchMiddleware<PatchCtx> = (ctx, next) => {
   const { key, preVal, nextVal, node } = ctx
   if (!key.startsWith(EPatchType.event)) return next()
   const event = key.slice(2).toLowerCase()
-  if (preVal[key]) node.removeEventListener(event, preVal[key])
+  if (preVal[key] && nextVal[key]) node.removeEventListener(event, preVal[key])
   if (nextVal[key]) node.addEventListener(event, nextVal[key])
 }
 export const classMiddleware: PatchMiddleware<PatchCtx> = (ctx, next) => {
@@ -66,7 +66,7 @@ export const childrenMiddleware: PatchMiddleware<PatchCtx> = (ctx, next) => {
 export const defaultMiddleware: PatchMiddleware<PatchCtx> = (ctx) => {
   const { key, nextVal, node } = ctx
   if (patchableKeys.includes(key as any) || key.startsWith(EPatchType.event)) return
-  ;(node as any)[key] = nextVal[key]
+  if (nextVal[key]) (node as any)[key] = nextVal[key]
 }
 
 export const updateNodeMiddleWare = createMiddleWare<PatchCtx>()

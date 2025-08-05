@@ -36,6 +36,7 @@ export function reconcilerFunctionComponentChildren(wip: Fiber | null) {
 
     const children = wip.tag === EFiberTags.ForwardRef ? wip.type(wip.props, wip.ref) : wip.type(wip.props)
     // console.log(children)
+    // console.log(children, wip)
 
     //加入子节点fiber,不是递归所有，只是当前节点的子节点
     reconcilerChildren(wip, children)
@@ -59,6 +60,8 @@ export function commitPlacement(fiber: Fiber) {
   console.log("commitPlacement")
   const parentFiber = getHostParentFiber(fiber)
   const parentDom = parentFiber?.stateNode as HTMLElement
+  console.log(parentDom, fiber)
+
   if (!parentDom) return
   if (fiber.tag === EFiberTags.HostComponent || fiber.tag === EFiberTags.HostText) {
     parentDom.appendChild(fiber.stateNode!)
@@ -82,14 +85,13 @@ export function commitUpdate(fiber: Fiber) {
     [EFiberTags.HostComponent]: (wip) => {
       const dom = wip.stateNode as HTMLElement
       const updates = wip.updateQueue ?? ([] as HostUpdateQueue)
+      //   if (wip.type === "a") console.log(updates, wip.alternate?.props)
       updateProperties(dom, wip.alternate?.props ?? {}, updates)
     },
     [EFiberTags.HostText]: (wip) => {
       const dom = wip.stateNode as HTMLElement
       const updates = wip.updateQueue as TextUpdateQueue
       //   console.log(wip, wip.alternate?.props?.children)
-      console.log(wip)
-
       dom.nodeValue = updates
     },
   }

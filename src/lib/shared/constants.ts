@@ -30,6 +30,7 @@ export const enum EFiberTags {
   Fragment = 7,
   HostRoot = 3,
   ForwardRef = 10,
+  RootFiber = 4,
 }
 
 export const enum EClassComponent {
