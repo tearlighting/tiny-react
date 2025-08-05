@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@tailwind utilities;
+html,
+body {
+  @apply h-full m-0 p-0 w-full box-border;
+}
