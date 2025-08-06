@@ -47,7 +47,7 @@ export function UseSyncExternalStore() {
       <p className="pl-8 pb-3">code</p>
       <MyCode>{example}</MyCode>
       <div className="text-center ">
-        <label className="mr-3">click me:</label>
+        <label className="mr-3 sm:inline hidden">click me:</label>
         <MyButton onClick={addCount}>count:{count}</MyButton>
       </div>
 

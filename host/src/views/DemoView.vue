@@ -11,7 +11,9 @@ import { useRoute } from "vue-router"
 
 const route = useRoute()
 const iframeSrc = computed(() => {
-  const res = import.meta.env.VITE_IFRAME_ORIGIN + route.path
+  const res = import.meta.env.VITE_IFRAME_ORIGIN + route.path.replace(import.meta.env.VITE_BASE_PATH, "")
+  console.log(res)
+
   startLoading()
   return res
 })

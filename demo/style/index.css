@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 .layout-container {
-  @apply grid grid-cols-[15rem_1fr] grid-rows-[5rem_1fr] h-screen;
+  @apply grid sm:grid-cols-[15rem_1fr] sm:grid-rows-[5rem_1fr] grid-cols-[10rem_1fr] grid-rows-[5rem_1fr] h-screen;
   .nav-container {
     @apply h-full overflow-hidden row-span-2 col-span-1 bg-purple-950;
   }
@@ -12,6 +12,7 @@
   }
   .content-container {
     @apply h-full overflow-hidden row-span-1 col-span-1;
+    /* @apply sm:bg-amber-50 md:bg-blue-50 lg:bg-green-50 xl:bg-red-50 2xl:bg-yellow-50; */
   }
 }
 

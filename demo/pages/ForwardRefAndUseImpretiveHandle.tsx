@@ -42,7 +42,7 @@ export function ForwardRefAndUseImpretiveHandle() {
       <div className="flex flex-col items-center justify-center mt-5">
         <MyInputWithRef ref={myInputRef} label="myInput" value="" />
         <div className="flex items-center gap-5 mt-5">
-          <label> click me:</label>
+          <label className="sm:inline hidden"> click me:</label>
           <MyButton onClick={() => myInputRef.current?.focus()}>focus</MyButton>
           <MyButton onClick={() => myInputRef.current?.blur()} type="success">
             blur

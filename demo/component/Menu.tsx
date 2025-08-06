@@ -13,6 +13,8 @@ export function Menu() {
 	text-gray-50
 	m-1
     transition-colors duration-200 
+    font-bold
+    text-xl
 	`"
       >
         <span>Tiny React</span>

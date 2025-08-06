@@ -31,7 +31,7 @@ export function UseMemo() {
       <p className="pl-8 pb-3">code</p>
       <MyCode>{example}</MyCode>
       <div className="flex justify-center items-center gap-5 mt-5">
-        <label> click me:</label>
+        <label className="sm:inline hidden"> click me:</label>
         <MyButton onClick={() => setCount(count + 1)}> count:{count}</MyButton>
         <MyButton onClick={clear} type="success">
           clear

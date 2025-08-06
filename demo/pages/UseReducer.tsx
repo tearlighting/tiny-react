@@ -15,7 +15,7 @@ export function UseReducer() {
       <p className="pl-8 pb-3">code</p>
       <MyCode>{example}</MyCode>
       <div className="flex justify-center items-center gap-5 mt-5">
-        <label> click me:</label>
+        <label className="sm:inline hidden"> click me:</label>
         <MyButton onClick={() => setCount(count)}>count:{count}</MyButton>
       </div>
       <p className="text-xl font-bold pl-5 py-5">Overview</p>

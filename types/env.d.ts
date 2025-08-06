@@ -1,6 +1,5 @@
 interface ImportMetaEnv {
-  readonly VITE_IFRAME_ORIGIN: string
-  // readonly VITE_BASE_PATH: string
+  readonly VITE_BASE_PATH: string
 }
 
 interface ImportMeta {
