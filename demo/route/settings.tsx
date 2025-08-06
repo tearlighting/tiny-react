@@ -19,6 +19,7 @@ import {
   ForwardRefAndUseImpretiveHandle,
   UseSyncExternalStore,
   Context,
+  Reflection,
 } from "#/pages"
 export interface IPageItem {
   path: string
@@ -195,6 +196,15 @@ export const pages: Array<IPageItem> = [
     element: (
       <DefaultLayout>
         <Context />
+      </DefaultLayout>
+    ),
+  },
+  {
+    path: "/reflection",
+    name: "reflection",
+    element: (
+      <DefaultLayout>
+        <Reflection />
       </DefaultLayout>
     ),
   },

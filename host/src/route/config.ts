@@ -75,4 +75,8 @@ export const routesConfig = [
     path: "/context",
     name: "context",
   },
+  {
+    path: "/reflection",
+    name: "reflection",
+  },
 ]
